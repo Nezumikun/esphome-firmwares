@@ -1,0 +1,28 @@
+text_sensor:
+  - platform: template
+    name: ${devicedescr} Uptime
+    id: ${devicename}_uptime_human
+    icon: mdi:clock-start
+
+sensor:
+  - platform: uptime
+    id: uptime_sensor
+    update_interval: 60s
+    internal: True
+    on_raw_value:
+      then:
+        - text_sensor.template.publish:
+            id: ${devicename}_uptime_human
+            state: !lambda |-
+              int seconds = round(id(uptime_sensor).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              return (
+                (days ? String(days) + " д. " : "") +
+                (hours ? String(hours) + " ч. " : "") +
+                (String(minutes) + " мин.")
+              ).c_str();

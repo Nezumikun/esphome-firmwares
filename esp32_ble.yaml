@@ -1,0 +1,48 @@
+esphome:
+  name: esp32
+  platform: ESP32
+  board: nodemcu-32s
+
+substitutions:
+  devicename: esp32_01
+  devicedescr: ESP32 01
+  
+packages:
+  wifi: !include common/network.yaml
+#  base_settings: !include common/base_settings.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml
+
+esp32_ble_tracker:
+  on_ble_advertise:
+    - then:
+        - lambda: |-
+            ESP_LOGD("ble_adv", "New BLE device");
+            ESP_LOGD("ble_adv", "  address: %s", x.address_str().c_str());
+            ESP_LOGD("ble_adv", "  name: %s", x.get_name().c_str());
+            ESP_LOGD("ble_adv", "  Advertised service UUIDs:");
+            for (auto uuid : x.get_service_uuids()) {
+                ESP_LOGD("ble_adv", "    - %s", uuid.to_string().c_str());
+            }
+            ESP_LOGD("ble_adv", "  Advertised service data:");
+            for (auto data : x.get_service_datas()) {
+                ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
+            }
+            ESP_LOGD("ble_adv", "  Advertised manufacturer data:");
+            for (auto data : x.get_manufacturer_datas()) {
+                ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
+            }
+
+binary_sensor:
+  - platform: ble_presence
+    mac_address: 78:85:F4:F2:72:2B
+    name: "HUAWEI WATCH GT 2 Pro-22B"
+  - platform: ble_presence
+    mac_address: F7:01:FF:9A:62:38
+    name: "Mi Band Wife"
+
+logger:
+
+web_server:
+  port: 80
+  

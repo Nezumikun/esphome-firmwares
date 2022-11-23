@@ -1,0 +1,58 @@
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: esp01_1m
+  on_boot:
+    priority: 800
+    then:
+      - switch.turn_on: green_blink
+
+packages:
+  wifi: !include common/network.yaml
+  base_settings: !include common/base_settings.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    id: button
+    on_press:
+      - switch.toggle: relay
+
+switch:
+  - platform: gpio
+    name: ${devicedescr} Relay
+    pin: GPIO12
+    id: relay
+  - platform: gpio
+    pin:
+      number: GPIO13
+      inverted: yes
+    id: green_led
+  - platform: template
+    optimistic: yes
+    id: green_blink
+    turn_on_action:
+    - while:
+        condition:
+          lambda: 'return true;'
+        then:
+        - if:
+            condition:
+              switch.is_off: green_led
+            then:
+              - switch.turn_on: green_led
+        - delay: 500ms 
+        - if:
+            condition:
+              wifi.connected:
+            else:
+              - switch.turn_off: green_led
+        - delay: 500ms
+    turn_off_action:
+    - switch.turn_off: green_led
+

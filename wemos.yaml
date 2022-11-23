@@ -1,0 +1,39 @@
+substitutions:
+  devicename: dit
+  devicedescr: DIT
+  platform: ESP8266
+  board: d1_mini
+#  board: esp01_1m
+
+esphome:
+  name: ${devicename}
+  platform: ${platform}
+  board: ${board}
+  
+switch:
+- platform: gpio
+  pin: 5
+  id: relay
+  name: "${devicedescr} Relay"
+  restore_mode: ALWAYS_OFF
+  on_turn_on:
+    - delay: 250ms
+    - switch.turn_off: relay
+
+logger:
+
+ota:
+  password: room414415
+
+web_server:
+  port: 80
+  auth:
+    username: dit
+    password: room414415
+
+
+packages:
+  uptime: !include common/uptime.yaml
+  network: !include common/solid_wifi.yaml
+  wifi_info: !include common/wifi_info.yaml
+ 

@@ -1,0 +1,54 @@
+substitutions:
+  devicename: test
+  platform: ESP8266
+  board: nodemcuv2
+
+esphome:
+  name: ${devicename}
+  platform: ${platform}
+  board: ${board}
+
+packages:
+  base_settings: !include common/base_settings.yaml
+  wifi: !include common/network.yaml
+
+i2c:
+  sda: D1
+  scl: D2
+  scan: false
+  setup_priority: -100
+
+font:
+  - file: "gfonts://Roboto Condensed"
+    id: font1
+    size: 20
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    reset_pin: D0
+    address: 0x3C
+    id: my_display
+    pages:
+      - id: page1
+        lambda: |-
+          it.print(0, 0, id(font1), "Hello World!");
+          it.printf(0, 22, id(font1), "%s", WiFi.localIP().toString().c_str());
+      - id: page2
+        lambda: |-
+          it.print(0, 0, id(font1), "Hello World!");
+#          it.printf(0, 22, id(font1), "%s", wifi::global_wifi_component->get_ap().get_ssid().c_str());
+    setup_priority: -100
+
+# interval:
+#   - interval: 10s
+#     then:
+#       - if:
+#           condition:
+#             display.is_displaying_page: page1
+#           then:
+#             - display.page.show: page2
+#             - component.update: my_display
+#           else:
+#             - display.page.show: page1
+#             - component.update: my_display

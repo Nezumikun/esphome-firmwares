@@ -1,0 +1,17 @@
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ${devicedescr} IP Address
+    ssid:
+      name: ${devicedescr} Connected SSID
+    bssid:
+      name: ${devicedescr} Connected BSSID
+    mac_address:
+      name: ${devicedescr} Mac Wifi Address
+#    scan_results:
+#      name: ESP Latest Scan Results
+
+sensor:
+  - platform: wifi_signal
+    name: ${devicedescr} WiFi Signal Quality
+    update_interval: 60s

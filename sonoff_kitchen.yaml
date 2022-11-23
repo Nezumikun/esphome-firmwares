@@ -1,0 +1,5 @@
+substitutions:
+  devicename: sonoff_basic_kitchen
+  devicedescr: SonOff Basic Kitchen
+
+<<: !include sonoff_common.yaml

@@ -1,0 +1,67 @@
+substitutions:
+  devicename: fastled
+  platform: ESP8266
+  board: nodemcuv2
+#  board: esp01_1m
+
+esphome:
+  name: ${devicename}
+  includes:
+    - custom/fastled_effects.h
+
+esp8266:
+  board: ${board}
+  framework:
+    version: 2.7.4
+
+packages:
+  base_settings: !include common/base_settings.yaml
+  wifi: !include common/network.yaml
+
+light:
+  - platform: fastled_clockless
+    chipset: WS2812B
+    pin: GPIO4
+    num_leds: 100
+    rgb_order: GRB
+    name: "FastLED WS2812B Light"
+    setup_priority: -100
+    effects:
+      - addressable_lambda:
+          name: "Demo"
+          update_interval: 10ms
+          lambda: |-
+            fastled_demo(it, initial_run);
+      - addressable_lambda:
+          name: "Rainbow"
+          update_interval: 10ms
+          lambda: |-
+            fastled_rainbow(it, initial_run);
+      - addressable_lambda:
+          name: "Confetti"
+          update_interval: 10ms
+          lambda: |-
+            fastled_confetti(it, initial_run);
+      - addressable_lambda:
+          name: "Sinelon"
+          update_interval: 10ms
+          lambda: |-
+            fastled_sinelon(it, initial_run);
+      - addressable_lambda:
+          name: "Juggle"
+          update_interval: 10ms
+          lambda: |-
+            fastled_juggle(it, initial_run);
+      - addressable_lambda:
+          name: "Beats"
+          update_interval: 10ms
+          lambda: |-
+            fastled_beats(it, initial_run);
+      - addressable_lambda:
+          name: "Noise"
+          update_interval: 10ms
+          lambda: |-
+            fastled_noise(it, initial_run);
+      - addressable_rainbow:
+          name: "Rainbow Inbox"
+      

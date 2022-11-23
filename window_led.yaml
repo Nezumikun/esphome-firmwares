@@ -1,0 +1,30 @@
+substitutions:
+  devicename: window_led
+  devicedescr: Гирлянда
+  platform: ESP8266
+  board: esp01_1m
+
+esphome:
+  name: ${devicename}
+  platform: ${platform}
+  board: ${board}
+  
+logger:
+
+ota:
+  password: room414415
+
+web_server:
+  port: 80
+
+packages:
+  wifi: !include common/network.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml
+
+switch:
+  - platform: gpio
+    name: ${devicedescr} Relay
+    id: relay
+    pin: 2
+    restore_mode: ALWAYS_ON

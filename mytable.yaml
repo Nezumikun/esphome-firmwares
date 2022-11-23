@@ -1,0 +1,38 @@
+substitutions:
+  devicename: mytable
+  devicedescr: My Table
+  platform: ESP8266
+  board: nodemcuv2
+
+esphome:
+  name: ${devicename}
+  platform: ${platform}
+  board: ${board}
+  
+switch:
+- platform: gpio
+  pin: D2
+  id: sitting_led
+
+sensor:
+  - platform: ultrasonic
+    trigger_pin: D6
+    echo_pin: D5
+    name: "${devicedescr} Ultrasonic Sensor"
+    update_interval: 5s
+    timeout: 5m
+
+api:
+  services:
+    - service: sitting_led_on
+      then:
+      - switch.turn_on: sitting_led
+    - service: sitting_led_off
+      then:
+      - switch.turn_off: sitting_led
+
+packages:
+  wifi: !include common/network.yaml
+  base_settings: !include common/base_settings.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml

@@ -1,0 +1,63 @@
+substitutions:
+  devicename: esp_sensor01_bme280
+  devicedescr: ESP Sensor 01 BME280
+  platform: ESP8266
+  board: nodemcuv2
+
+esphome:
+  name: ${devicename}
+  platform: ${platform}
+  board: ${board}
+  on_boot:
+    priority: 800
+    then:
+      - switch.turn_on: green_temp
+
+i2c:
+  sda: D6
+  scl: D5
+  scan: True
+
+switch:
+- platform: gpio
+  pin: D2
+  id: green_led
+- platform: template
+#  name: "Green LED"
+  optimistic: yes
+  id: green_temp
+  turn_on_action:
+  - while:
+      condition:
+        lambda: 'return true;'
+      then:
+      - switch.turn_on: green_led
+      - delay: 500ms 
+      - switch.turn_off: green_led
+      - delay: 500ms
+  turn_off_action:
+  - switch.turn_off: green_led
+
+sensor:
+  - platform: bme280
+    temperature:
+      name: "temperature_esphome01_bme280"
+      oversampling: 16x
+      id: bme280_temperature
+    pressure:
+      name: "pressure_esphome01_bme280"
+      unit_of_measurement: "mm Hg"
+      filters:
+        - multiply: 0.75006375541921
+    humidity:
+      name: "humidity_esphome01_bme280"
+      id: bme280_humidity
+    address: 0x76
+    update_interval: 60s
+
+packages:
+  wifi: !include common/network.yaml
+  base_settings: !include common/base_settings.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml
+  clock: !include common/clock.yaml

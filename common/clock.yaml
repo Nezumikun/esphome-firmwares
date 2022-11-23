@@ -1,0 +1,62 @@
+spi:
+  clk_pin: D1
+  mosi_pin: D7
+
+globals:
+  - id: time_synced
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+display:
+  - platform: max7219digit
+    cs_pin: D8
+    num_chips: 4
+    intensity: 8
+    update_interval:
+      milliseconds: 500
+    lambda: |-
+      static bool show_dot = true;
+      if (id(time_synced)) {
+        unsigned char seconds = id(sntp_time).now().second;
+        if (seconds >= 10 && seconds < 15) {
+          float temperature = id(bme280_temperature).state;
+          it.print(1, 0, id(digit_font), temperature > 0 ? "+" : temperature < 0 ? "-" : " ");
+          it.printf(9, 0, id(digit_font), "%02.0f", temperature);
+          if (show_dot) {
+            it.print(25, -5, id(digit_font), ".");
+          }
+        } else if (seconds >= 40 && seconds < 45) {
+          float humidity = id(bme280_humidity).state;
+          it.printf(6, 0, id(digit_font), "%02.0f", humidity);
+          if (show_dot) {
+            it.print(23, -1, id(digit_font), "%");
+          }
+        } else {
+          it.strftime(1, 0, id(digit_font), "%H", id(sntp_time).now());
+          if (show_dot) {
+            it.print(15, 0, id(digit_font), ":");
+          }
+          it.strftime(19, 0, id(digit_font), "%M", id(sntp_time).now());
+        }
+      } else {
+        if (show_dot) {
+          it.print(15, 0, id(digit_font), ":");
+        }
+      }
+      show_dot = !show_dot;
+font:
+  - file: "ttf/ErbosDraco1StOpenNbpRegular-l5wX.ttf"
+    id: digit_font
+    size: 8
+
+time:
+  - platform: homeassistant
+    id: hass_time
+  - platform: sntp
+    id: sntp_time
+    on_time_sync:
+      then:
+        - lambda: |-
+            id(time_synced) = true;
+        - logger.log: "Synchronized system clock"
