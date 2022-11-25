@@ -71,4 +71,3 @@ light:
           update_interval: 10ms
           lambda: |-
             Nezumikun::FastLedStrip::noise(it, initial_run);
-      
