@@ -1,7 +1,8 @@
 substitutions:
   devicename: fastled
   platform: ESP8266
-  board: nodemcuv2
+#  board: nodemcuv2
+  board: esp01_1m
 
 esphome:
   name: ${devicename}
@@ -13,6 +14,7 @@ esphome:
       - light.control:
           id: fastled_strip
           state: on
+          effect: "Demo"
 
 esp8266:
   board: ${board}
@@ -20,55 +22,55 @@ esp8266:
     version: 2.7.4
 
 packages:
-  base_settings: !include common/base_settings.yaml
+#  base_settings: !include common/base_settings.yaml
   wifi: !include common/network.yaml
+
+web_server:
+  port: 80
+logger:
 
 light:
   - platform: fastled_clockless
     chipset: WS2812B
-    pin: GPIO4
+    pin: GPIO0
     num_leds: 100
     rgb_order: GRB
     name: "FastLED WS2812B Light"
     id: fastled_strip
-    on_turn_on:
-      - light.control:
-          id: fastled_strip
-          effect: "Demo"
     effects:
       - addressable_lambda:
           name: "Demo"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::demo(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_demo(it, initial_run);
       - addressable_lambda:
           name: "Rainbow"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::rainbow(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_rainbow(it, initial_run);
       - addressable_lambda:
           name: "Confetti"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::confetti(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_confetti(it, initial_run);
       - addressable_lambda:
           name: "Sinelon"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::sinelon(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_sinelon(it, initial_run);
       - addressable_lambda:
           name: "Juggle"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::juggle(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_juggle(it, initial_run);
       - addressable_lambda:
           name: "Beats"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::beats(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_beats(it, initial_run);
       - addressable_lambda:
           name: "Noise"
           update_interval: 10ms
           lambda: |-
-            Nezumikun::FastLedStrip::noise(it, initial_run);
+            Nezumikun::FastLedStrip::fastled_noise(it, initial_run);
       
