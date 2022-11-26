@@ -64,7 +64,7 @@ namespace Nezumikun {
         return _value;
       }
 
-      static inline CRGB* init_fastled_buffer(uint8_t size) {
+      static inline CRGB* init_fastled_buffer(uint16_t size) {
         CRGB *temp = buffer(NULL);
         if (temp == NULL) {
           ESP_LOGD("FastLedStrip", "Initial buffer (size %d)", size);
@@ -76,7 +76,7 @@ namespace Nezumikun {
 
       static inline void copy_fastled_buffer(AddressableLight &it) {
         CRGB *temp = buffer(NULL);
-        for (uint8_t i = 0; i < it.size(); i++) {
+        for (uint16_t i = 0; i < it.size(); i++) {
           it[i] = ColorFromCRGB(temp[i]);
         }
         hue(PropertyAction::Inc, 1);
@@ -85,30 +85,51 @@ namespace Nezumikun {
     public:
       static void rainbow(AddressableLight &it, bool initial_run) {
         static bool withGlitter = false;
+        static uint8_t step = 0;
+        if (step == 0) {
+          step = 255 / it.size();
+          if (step == 0) step = 1;
+        }
         CRGB *temp = init_fastled_buffer(it.size());
         if (initial_run) {
           withGlitter = random8() & 1;
           ESP_LOGD("fastled_rainbow", "Glitter %s", withGlitter ? "ON" : "OFF");
         }
-        fill_rainbow(temp, it.size(), hue(PropertyAction::Get, 0), 255 / it.size());
+        fill_rainbow(temp, it.size(), hue(PropertyAction::Get, 0), step);
         if(withGlitter && (random8() < 60)) {
           temp[random16(it.size())] += CRGB::White;
         }
         copy_fastled_buffer(it);
+        EVERY_N_SECONDS(20) {
+          withGlitter = random8() & 1;
+          ESP_LOGD("fastled_rainbow", "Glitter %s", withGlitter ? "ON" : "OFF");
+        }
       }
 
       static void confetti(AddressableLight &it, bool initial_run) {
         // random colored speckles that blink in and fade smoothly
+        static uint8_t fadeValue = 0;
+        if (fadeValue == 0) {
+          fadeValue = 10 * 64 / it.size();
+          if (fadeValue == 0) fadeValue = 1;
+          ESP_LOGD("fastled_confetti", "Fade value = %d", fadeValue);
+        }
         CRGB *temp = init_fastled_buffer(it.size());
-        fadeToBlackBy(temp, it.size(), 10);
+        fadeToBlackBy(temp, it.size(), fadeValue);
         int pos = random16(it.size());
         temp[pos] += CHSV(hue(PropertyAction::Get, 0) + random8(64), 200, 255);
         copy_fastled_buffer(it);
       }
 
       static void sinelon(AddressableLight &it, bool initial_run) {
+        static uint8_t fadeValue = 0;
+        if (fadeValue == 0) {
+          fadeValue = 20 * 64 / it.size();
+          if (fadeValue == 0) fadeValue = 1;
+          ESP_LOGD("fastled_sinelon", "Fade value = %d", fadeValue);
+        }
         CRGB *temp = init_fastled_buffer(it.size());
-        fadeToBlackBy(temp, it.size(), 10);
+        fadeToBlackBy(temp, it.size(), fadeValue);
         int pos = beatsin16(13, 0, it.size() - 1);
         temp[pos] += CHSV(hue(PropertyAction::Get, 0), 255, 192);
         copy_fastled_buffer(it);
@@ -120,7 +141,7 @@ namespace Nezumikun {
         const uint8_t BeatsPerMinute = 62;
         CRGBPalette16 palette = PartyColors_p;
         uint8_t beat = beatsin8(BeatsPerMinute, 64, 255);
-        for( int i = 0; i < it.size(); i++) { //9948
+        for (int i = 0; i < it.size(); i++) { //9948
           temp[i] = ColorFromPalette(palette, hue(PropertyAction::Get, 0) + (i*2), beat - hue(PropertyAction::Get, 0) +(i*10));
         }
         copy_fastled_buffer(it);
@@ -128,8 +149,14 @@ namespace Nezumikun {
 
       static void juggle(AddressableLight &it, bool initial_run) {
         // eight colored dots, weaving in and out of sync with each other
+        static uint8_t fadeValue = 0;
+        if (fadeValue == 0) {
+          fadeValue = 10 * 64 / it.size();
+          if (fadeValue == 0) fadeValue = 1;
+          ESP_LOGD("fastled_juggle", "Fade value = %d", fadeValue);
+        }
         CRGB *temp = init_fastled_buffer(it.size());
-        fadeToBlackBy(temp, it.size(), 10);
+        fadeToBlackBy(temp, it.size(), fadeValue);
         uint8_t dothue = 0;
         for( int i = 0; i < 8; i++) {
           temp[beatsin16(i + 7, 0, it.size()-1 )] |= CHSV(dothue, 200, 255);
