@@ -3,17 +3,11 @@ substitutions:
   platform: ESP8266
   board: nodemcuv2
   devicedescr: FastLED Strip
+  strip_num_leds: '100'
+  strip_pin: GPIO4
 
 esphome:
   name: ${devicename}
-  includes:
-    - custom/FastLedStrip
-  on_boot:
-    priority: 600
-    then:
-      - light.control:
-          id: fastled_strip
-          state: on
 
 esp8266:
   board: ${board}
@@ -25,52 +19,4 @@ packages:
   wifi: !include common/network.yaml
   uptime: !include common/uptime.yaml
   wifi_info: !include common/wifi_info.yaml
-
-light:
-  - platform: fastled_clockless
-    chipset: WS2812B
-    pin: GPIO4
-    num_leds: 100
-    rgb_order: GRB
-    name: "FastLED WS2812B Light"
-    id: fastled_strip
-    on_turn_on:
-      - light.control:
-          id: fastled_strip
-          effect: "Demo"
-    effects:
-      - addressable_lambda:
-          name: "Demo"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::demo(it, initial_run);
-      - addressable_lambda:
-          name: "Rainbow"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::rainbow(it, initial_run);
-      - addressable_lambda:
-          name: "Confetti"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::confetti(it, initial_run);
-      - addressable_lambda:
-          name: "Sinelon"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::sinelon(it, initial_run);
-      - addressable_lambda:
-          name: "Juggle"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::juggle(it, initial_run);
-      - addressable_lambda:
-          name: "Beats"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::beats(it, initial_run);
-      - addressable_lambda:
-          name: "Noise"
-          update_interval: 10ms
-          lambda: |-
-            Nezumikun::FastLedStrip::noise(it, initial_run);
+  fastled_strip: !include common/fastled_strip.yaml

@@ -1,0 +1,72 @@
+esphome:
+  includes:
+    - custom/FastLedStrip
+  on_boot:
+    priority: 600
+    then:
+      - light.control:
+          id: fastled_strip
+          state: on
+
+custom_component:
+- lambda: |-
+    auto my_custom = new Nezumikun::FastLedStripComponent();
+    return {my_custom};
+  components:
+  - id: strip
+
+light:
+  - platform: fastled_clockless
+    chipset: WS2812B
+    pin: ${strip_pin}
+    num_leds: ${strip_num_leds}
+    rgb_order: GRB
+    name: "FastLED WS2812B Light"
+    id: fastled_strip
+    on_turn_on:
+      - light.control:
+          id: fastled_strip
+          effect: "Demo"
+    effects:
+      - addressable_lambda:
+          name: "Demo"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->demo(it, initial_run);
+      - addressable_lambda:
+          name: "Rainbow"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->rainbow(it, initial_run);
+      - addressable_lambda:
+          name: "Confetti"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->confetti(it, initial_run);
+      - addressable_lambda:
+          name: "Sinelon"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->sinelon(it, initial_run);
+      - addressable_lambda:
+          name: "Juggle"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->juggle(it, initial_run);
+      - addressable_lambda:
+          name: "Beats"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->beats(it, initial_run);
+      - addressable_lambda:
+          name: "Noise"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::FastLedStripComponent*>(ptr)->noise(it, initial_run);

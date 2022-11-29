@@ -3,26 +3,22 @@
 namespace esphome {
   namespace Nezumikun {
 
-    uint8_t FastLedStrip::hue = 0;
-    CRGB* FastLedStrip::buffer = NULL;
-
-    CRGB* FastLedStrip::init_fastled_buffer(uint16_t size) {
+    void FastLedStripComponent::init_fastled_buffer(uint16_t size) {
       if (buffer == NULL) {
-        esphome::ESP_LOGD("FastLedStrip", "Initial buffer (size %d)", size);
+        ESP_LOGD("FastLedStrip", "Initial buffer (size %d)", size);
         buffer = new CRGB[size]();
         fill_solid(buffer, size, CRGB::Black);
       }
-      return buffer;
     }
 
-    void FastLedStrip::copy_fastled_buffer(AddressableLight &it) {
+    void FastLedStripComponent::copy_fastled_buffer(AddressableLight &it) {
       for (uint16_t i = 0; i < it.size(); i++) {
         it[i] = ColorFromCRGB(buffer[i]);
       }
       hue++;
     }
 
-    void FastLedStrip::rainbow(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::rainbow(AddressableLight &it, bool initial_run) {
       static bool withGlitter = false;
       static uint8_t step = 0;
       if (step == 0) {
@@ -45,7 +41,7 @@ namespace esphome {
       }
     }
 
-    void FastLedStrip::confetti(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::confetti(AddressableLight &it, bool initial_run) {
       // random colored speckles that blink in and fade smoothly
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
@@ -60,7 +56,7 @@ namespace esphome {
       copy_fastled_buffer(it);
     }
 
-    void FastLedStrip::sinelon(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::sinelon(AddressableLight &it, bool initial_run) {
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
         fadeValue = 20 * 64 / it.size();
@@ -74,7 +70,7 @@ namespace esphome {
       copy_fastled_buffer(it);
     }
 
-    void FastLedStrip::beats(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::beats(AddressableLight &it, bool initial_run) {
       // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
       init_fastled_buffer(it.size());
       const uint8_t BeatsPerMinute = 62;
@@ -86,7 +82,7 @@ namespace esphome {
       copy_fastled_buffer(it);
     }
 
-    void FastLedStrip::juggle(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::juggle(AddressableLight &it, bool initial_run) {
       // eight colored dots, weaving in and out of sync with each other
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
@@ -126,7 +122,7 @@ namespace esphome {
       255,  42,  0,  0
     };
 
-    void FastLedStrip::noise(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::noise(AddressableLight &it, bool initial_run) {
       static uint16_t x = 0;
       static uint16_t y = 0;
       static uint8_t subMode = 0;
@@ -162,7 +158,7 @@ namespace esphome {
       EVERY_N_SECONDS(20) { subMode = (subMode + 1) % 7; }
     }
 
-    void FastLedStrip::demo(AddressableLight &it, bool initial_run) {
+    void FastLedStripComponent::demo(AddressableLight &it, bool initial_run) {
       static uint8_t effectIndex;
       switch (effectIndex) {
         case 0:

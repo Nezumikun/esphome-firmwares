@@ -29,20 +29,22 @@ namespace esphome {
       return result;
     }
 
-    class FastLedStrip {
+    class FastLedStripComponent: public Component {
       protected:
-        static CRGB *buffer;
-        static uint8_t hue;
-        static CRGB* init_fastled_buffer(uint16_t size);
-        static void copy_fastled_buffer(AddressableLight &it);
+        CRGB *buffer = NULL;
+        uint8_t hue = 0;
+        void init_fastled_buffer(uint16_t size);
+        void copy_fastled_buffer(AddressableLight &it);
       public:
-        static void rainbow(AddressableLight &it, bool initial_run);
-        static void confetti(AddressableLight &it, bool initial_run);
-        static void sinelon(AddressableLight &it, bool initial_run);
-        static void beats(AddressableLight &it, bool initial_run);
-        static void juggle(AddressableLight &it, bool initial_run);
-        static void noise(AddressableLight &it, bool initial_run);
-        static void demo(AddressableLight &it, bool initial_run);
+        void setup() override {}
+        void loop() override {}
+        void rainbow(AddressableLight &it, bool initial_run);
+        void confetti(AddressableLight &it, bool initial_run);
+        void sinelon(AddressableLight &it, bool initial_run);
+        void beats(AddressableLight &it, bool initial_run);
+        void juggle(AddressableLight &it, bool initial_run);
+        void noise(AddressableLight &it, bool initial_run);
+        void demo(AddressableLight &it, bool initial_run);
     };
   }
 }
