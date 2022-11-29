@@ -7,7 +7,7 @@ substitutions:
 esphome:
   name: ${devicename}
   includes:
-    - custom/fastled_strip.h
+    - custom/FastLedStrip
   on_boot:
     priority: 600
     then:
@@ -30,7 +30,7 @@ light:
   - platform: fastled_clockless
     chipset: WS2812B
     pin: GPIO4
-    num_leds: 300
+    num_leds: 100
     rgb_order: GRB
     name: "FastLED WS2812B Light"
     id: fastled_strip

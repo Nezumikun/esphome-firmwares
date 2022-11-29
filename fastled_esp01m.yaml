@@ -3,18 +3,18 @@ substitutions:
   platform: ESP8266
 #  board: nodemcuv2
   board: esp01_1m
+  devicedescr: FastLED Strip
 
 esphome:
   name: ${devicename}
   includes:
-    - custom/fastled_strip.h
+    - custom/FastLedStrip
   on_boot:
     priority: 600
     then:
       - light.control:
           id: fastled_strip
           state: on
-          effect: "Demo"
 
 esp8266:
   board: ${board}
@@ -22,8 +22,10 @@ esp8266:
     version: 2.7.4
 
 packages:
-#  base_settings: !include common/base_settings.yaml
+  base_settings: !include common/base_settings.yaml
   wifi: !include common/network.yaml
+  uptime: !include common/uptime.yaml
+  wifi_info: !include common/wifi_info.yaml
 
 web_server:
   port: 80
@@ -37,6 +39,10 @@ light:
     rgb_order: GRB
     name: "FastLED WS2812B Light"
     id: fastled_strip
+    on_turn_on:
+      - light.control:
+          id: fastled_strip
+          effect: "Demo"
     effects:
       - addressable_lambda:
           name: "Demo"
