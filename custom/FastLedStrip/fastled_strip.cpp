@@ -159,7 +159,13 @@ namespace esphome {
     }
 
     void FastLedStripComponent::demo(AddressableLight &it, bool initial_run) {
+      if (initial_run) {
+        firstPass = true;
+      }
       static uint8_t effectIndex;
+      const char* effectNames[] = {
+        "Rainbow", "Confetti", "Sinelon", "Beats", "Juggle", "Noise"
+      };
       switch (effectIndex) {
         case 0:
           rainbow(it, initial_run);
@@ -182,7 +188,26 @@ namespace esphome {
         default:
           break;
       }
-      EVERY_N_SECONDS(20) { effectIndex = (effectIndex + 1) % 6; }
+      EVERY_N_SECONDS(20) { 
+        uint8_t prevIndex = effectIndex;
+        if (firstPass) {
+          effectIndex = (effectIndex + 1) % 6;
+          if (effectIndex == 0) {
+            firstPass = false;
+            effectIndex = prevIndex;
+          } else {
+            ESP_LOGD("fastled_demo", "Start effect [%d] %s in first pass", effectIndex, effectNames[effectIndex]);
+          }
+        }
+        if (!firstPass) {
+          if ((random8() & 1) == 1) {
+            effectIndex = random8(5);
+            if (prevIndex != effectIndex) {
+              ESP_LOGD("fastled_demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
+            }
+          }
+        }
+      }
     }
 
   }

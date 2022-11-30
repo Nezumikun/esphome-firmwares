@@ -33,6 +33,7 @@ namespace esphome {
       protected:
         CRGB *buffer = NULL;
         uint8_t hue = 0;
+        bool firstPass = true;
         void init_fastled_buffer(uint16_t size);
         void copy_fastled_buffer(AddressableLight &it);
       public:
