@@ -15,8 +15,8 @@ esp8266:
     version: 2.7.4
 
 packages:
-  base_settings: !include common/base_settings.yaml
-  wifi: !include common/network.yaml
-  uptime: !include common/uptime.yaml
-  wifi_info: !include common/wifi_info.yaml
-  fastled_strip: !include common/fastled_strip.yaml
+  base_settings: !include packages/base_settings.yaml
+  wifi: !include packages/network.yaml
+  uptime: !include packages/uptime.yaml
+  wifi_info: !include packages/wifi_info.yaml
+  fastled_strip: !include packages/fastled_strip.yaml

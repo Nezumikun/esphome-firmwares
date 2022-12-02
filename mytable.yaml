@@ -32,7 +32,7 @@ api:
       - switch.turn_off: sitting_led
 
 packages:
-  wifi: !include common/network.yaml
-  base_settings: !include common/base_settings.yaml
-  uptime: !include common/uptime.yaml
-  wifi_info: !include common/wifi_info.yaml
+  wifi: !include packages/network.yaml
+  base_settings: !include packages/base_settings.yaml
+  uptime: !include packages/uptime.yaml
+  wifi_info: !include packages/wifi_info.yaml

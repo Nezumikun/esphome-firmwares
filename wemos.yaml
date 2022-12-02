@@ -33,7 +33,7 @@ web_server:
 
 
 packages:
-  uptime: !include common/uptime.yaml
-  network: !include common/solid_wifi.yaml
-  wifi_info: !include common/wifi_info.yaml
+  uptime: !include packages/uptime.yaml
+  network: !include packages/solid_wifi.yaml
+  wifi_info: !include packages/wifi_info.yaml
  

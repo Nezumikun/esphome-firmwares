@@ -9,8 +9,8 @@ esphome:
   board: ${board}
 
 packages:
-  base_settings: !include common/base_settings.yaml
-  wifi: !include common/network.yaml
+  base_settings: !include packages/base_settings.yaml
+  wifi: !include packages/network.yaml
 
 i2c:
   sda: D1
