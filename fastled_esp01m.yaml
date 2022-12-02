@@ -6,6 +6,7 @@ substitutions:
   devicedescr: FastLED Strip
   strip_num_leds: '100'
   strip_pin: GPIO0
+  alive_pin: GPIO2
 
 esphome:
   name: ${devicename}
@@ -21,3 +22,4 @@ packages:
   uptime: !include common/uptime.yaml
   wifi_info: !include common/wifi_info.yaml
   fastled_strip: !include common/fastled_strip.yaml
+  alive_led: !include common/alive_led.yaml

@@ -1,0 +1,31 @@
+esphome:
+  on_boot:
+    priority: 800
+    then:
+      - switch.turn_on: alive_blink
+
+switch:
+  - platform: gpio
+    pin:
+      number: ${alive_pin}
+      inverted: yes
+    id: alive_led
+  - platform: template
+    optimistic: yes
+    id: alive_blink
+    turn_on_action:
+    - switch.turn_off: alive_led
+    - while:
+        condition:
+          lambda: 'return true;'
+        then:
+        - switch.toggle: alive_led
+        - delay: 250ms 
+        - if:
+            condition:
+              wifi.connected:
+            else:
+              - switch.toggle: alive_led
+        - delay: 250ms
+    turn_off_action:
+    - switch.turn_off: alive_led
