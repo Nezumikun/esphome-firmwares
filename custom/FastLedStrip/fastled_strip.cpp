@@ -72,12 +72,18 @@ namespace esphome {
 
     void FastLedStripComponent::beats(AddressableLight &it, bool initial_run) {
       // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+      static uint8_t koefficient = 0;
+      if (koefficient == 0) {
+        koefficient = 10 * it.size() / 64;
+        if (koefficient == 0) koefficient = 1;
+        ESP_LOGD("fastled_beats", "koefficient = %d", koefficient);
+      }
       init_fastled_buffer(it.size());
       const uint8_t BeatsPerMinute = 62;
       CRGBPalette16 palette = PartyColors_p;
       uint8_t beat = beatsin8(BeatsPerMinute, 64, 255);
       for (int i = 0; i < it.size(); i++) { //9948
-        buffer[i] = ColorFromPalette(palette, hue + (i*2), beat - hue +(i*10));
+        buffer[i] = ColorFromPalette(palette, hue + (i*2), beat - hue +(i*koefficient));
       }
       copy_fastled_buffer(it);
     }
@@ -107,6 +113,7 @@ namespace esphome {
       192, 250,  77, 127,    //Pink
       255, 171, 101, 221     //Purple
     };
+
     DEFINE_GRADIENT_PALETTE( xmas_gp ) {
       0,   0, 12,  0,
       40,   0, 55,  0,
@@ -126,8 +133,18 @@ namespace esphome {
       static uint16_t x = 0;
       static uint16_t y = 0;
       static uint8_t subMode = 0;
+      EVERY_N_SECONDS(20) {
+        subMode = (subMode + 1) % 7;
+        initial_run = true;
+      }
+      if (initial_run) {
+        ESP_LOGD("fastled_noise", "Submode = %s", subMode == 0 ? "XMas" : subMode == 1 ? "Heat" : subMode == 2 ? "Party"
+          : subMode == 3 ? "Rainbow" : subMode == 4 ? "Lava" : subMode == 5 ? "Cloud" : subMode == 6 ? "Aurora"
+          : "Unknown"
+        );
+      }
       init_fastled_buffer(it.size());
-      for(uint8_t i = 0; i < it.size(); i++) {
+      for(uint16_t i = 0; i < it.size(); i++) {
         switch(subMode) {
           case 0:
             buffer[i] = ColorFromPalette((CRGBPalette16) xmas_gp, inoise8(i * 40, y));
@@ -155,17 +172,119 @@ namespace esphome {
       x++;
       y += 10;
       copy_fastled_buffer(it);
-      EVERY_N_SECONDS(20) { subMode = (subMode + 1) % 7; }
+    }
+
+    void FastLedStripComponent::test(AddressableLight &it, bool initial_run) {
+      static uint16_t value = 0;
+      static uint8_t step = 0;
+      const uint8_t inc = 3;
+      init_fastled_buffer(it.size());
+      switch (step) {
+        case 0:
+          fill_solid(buffer, it.size(), CRGB(value, 0, 0));
+          if (value == 255) {
+            step++;
+          } else {
+            value += inc;
+            if (value > 255) {
+              value = 255;
+            }
+          }
+          break;
+        case 1:
+          fill_solid(buffer, it.size(), CRGB(value, 0, 0));
+          if (value == 0) {
+            step++;
+          } else {
+            if (value < inc) {
+              value = 0;
+            } else {
+              value -= inc;
+            }
+          }
+          break;
+        case 2:
+          fill_solid(buffer, it.size(), CRGB(0, value, 0));
+          if (value == 255) {
+            step++;
+          } else {
+            value += inc;
+            if (value > 255) {
+              value = 255;
+            }
+          }
+          break;
+        case 3:
+          fill_solid(buffer, it.size(), CRGB(0, value, 0));
+          if (value == 0) {
+            step++;
+          } else {
+            if (value < inc) {
+              value = 0;
+            } else {
+              value -= inc;
+            }
+          }
+          break;
+        case 4:
+          fill_solid(buffer, it.size(), CRGB(0, 0, value));
+          if (value == 255) {
+            step++;
+          } else {
+            value += inc;
+            if (value > 255) {
+              value = 255;
+            }
+          }
+          break;
+        case 5:
+          fill_solid(buffer, it.size(), CRGB(0, 0, value));
+          if (value == 0) {
+            testComplited = true;
+          } else {
+            if (value < inc) {
+              value = 0;
+            } else {
+              value -= inc;
+            }
+          }
+          break;
+      }
+      copy_fastled_buffer(it);
     }
 
     void FastLedStripComponent::demo(AddressableLight &it, bool initial_run) {
-      if (initial_run) {
-        firstPass = true;
-      }
       static uint8_t effectIndex;
       const char* effectNames[] = {
         "Rainbow", "Confetti", "Sinelon", "Beats", "Juggle", "Noise"
       };
+      if (initial_run) {
+        firstPass = true;
+      }
+      if (!testComplited) {
+        test(it, initial_run);
+        return;
+      }
+      EVERY_N_SECONDS(20) { 
+        uint8_t prevIndex = effectIndex;
+        if (firstPass) {
+          effectIndex = (effectIndex + 1) % 6;
+          if (effectIndex == 0) {
+            firstPass = false;
+            effectIndex = prevIndex;
+          } else {
+            ESP_LOGD("fastled_demo", "Start effect [%d] %s in first pass", effectIndex, effectNames[effectIndex]);
+          }
+        }
+        if (!firstPass) {
+          if ((random8() & 1) == 1) {
+            effectIndex = random8(5);
+            if (prevIndex != effectIndex) {
+              ESP_LOGD("fastled_demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
+            }
+          }
+        }
+      }
       switch (effectIndex) {
         case 0:
           rainbow(it, initial_run);
@@ -187,26 +306,6 @@ namespace esphome {
           break;
         default:
           break;
-      }
-      EVERY_N_SECONDS(20) { 
-        uint8_t prevIndex = effectIndex;
-        if (firstPass) {
-          effectIndex = (effectIndex + 1) % 6;
-          if (effectIndex == 0) {
-            firstPass = false;
-            effectIndex = prevIndex;
-          } else {
-            ESP_LOGD("fastled_demo", "Start effect [%d] %s in first pass", effectIndex, effectNames[effectIndex]);
-          }
-        }
-        if (!firstPass) {
-          if ((random8() & 1) == 1) {
-            effectIndex = random8(5);
-            if (prevIndex != effectIndex) {
-              ESP_LOGD("fastled_demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
-            }
-          }
-        }
       }
     }
 

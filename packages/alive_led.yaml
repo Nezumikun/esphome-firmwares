@@ -29,3 +29,7 @@ switch:
         - delay: 250ms
     turn_off_action:
     - switch.turn_off: alive_led
+
+logger:
+  logs:
+    switch: INFO

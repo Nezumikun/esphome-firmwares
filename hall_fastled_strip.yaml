@@ -1,11 +1,11 @@
 substitutions:
-  devicename: fastled
+  devicename: hall_fastled_strip
   platform: ESP8266
-#  board: nodemcuv2
-  board: esp01_1m
+  board: nodemcuv2
+#  board: esp01_1m
   devicedescr: FastLED Strip
   strip_num_leds: '300'
-  strip_pin: GPIO0
+  strip_pin: GPIO4
   alive_pin: GPIO2
 
 esphome:
