@@ -8,6 +8,11 @@ esphome:
           id: fastled_strip
           state: on
 
+esp8266:
+  board: ${board}
+  framework:
+    version: 2.7.4
+
 custom_component:
 - lambda: |-
     auto my_custom = new Nezumikun::FastLedStripComponent();
@@ -20,7 +25,7 @@ light:
     chipset: WS2812B
     pin: ${strip_pin}
     num_leds: ${strip_num_leds}
-    rgb_order: GRB
+    rgb_order: ${strip_rgb_order}
     name: "FastLED WS2812B Light"
     id: fastled_strip
     on_turn_on:

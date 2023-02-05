@@ -5,16 +5,12 @@ substitutions:
   board: esp01_1m
   devicedescr: FastLED Strip
   strip_num_leds: '300'
+  strip_rgb_order: GRB
   strip_pin: GPIO0
   alive_pin: GPIO2
 
 esphome:
   name: ${devicename}
-
-esp8266:
-  board: ${board}
-  framework:
-    version: 2.7.4
 
 packages:
   base_settings: !include packages/base_settings.yaml

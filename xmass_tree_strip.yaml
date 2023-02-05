@@ -1,12 +1,12 @@
 substitutions:
-  devicename: hall_fastled_strip
+  devicename: xmass_tree_strip
   platform: ESP8266
-  board: nodemcuv2
-#  board: esp01_1m
-  devicedescr: FastLED Strip
-  strip_num_leds: '300'
-  strip_rgb_order: GRB
-  strip_pin: GPIO4
+#  board: nodemcuv2
+  board: esp01_1m
+  devicedescr: XMass Tree Strip
+  strip_num_leds: '100'
+  strip_rgb_order: RGB
+  strip_pin: GPIO0
   alive_pin: GPIO2
 
 esphome:

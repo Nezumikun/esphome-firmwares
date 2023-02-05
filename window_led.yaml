@@ -1,30 +1,66 @@
 substitutions:
   devicename: window_led
-  devicedescr: Гирлянда
+  devicedescr: "Гирлянда на окне"
   platform: ESP8266
-  board: esp01_1m
+  strip_num_leds: "150"
+  board: nodemcuv2
+  strip_pin: GPIO4
+  alive_pin: GPIO2
+#  board: esp01_1m
+#  strip_pin: GPIO0
+#  alive_pin: GPIO2
 
 esphome:
   name: ${devicename}
-  platform: ${platform}
+#  includes:
+#    - custom/FastLedStrip
+  on_boot:
+    priority: 600
+    then:
+      - light.control:
+          id: window_strip
+          state: on
+
+esp8266:
   board: ${board}
-  
-logger:
-
-ota:
-  password: room414415
-
-web_server:
-  port: 80
+  framework:
+    version: 2.7.4
 
 packages:
+  base_settings: !include packages/base_settings.yaml
   wifi: !include packages/network.yaml
   uptime: !include packages/uptime.yaml
-  wifi_info: !include packages/wifi_info.yaml
 
-switch:
-  - platform: gpio
-    name: ${devicedescr} Relay
-    id: relay
-    pin: 2
-    restore_mode: ALWAYS_ON
+light:
+  - platform: fastled_clockless
+    chipset: WS2812B
+    pin: ${strip_pin}
+    num_leds: ${strip_num_leds}
+    rgb_order: GRB
+    name: "FastLED WS2812B Light"
+    id: window_strip
+    on_turn_on:
+      - light.control:
+          id: window_strip
+          effect: "Demo"
+    effects:
+      - addressable_lambda:
+          name: "Demo"
+          update_interval: 10ms
+          lambda: |-
+            // it.size() - Number of LEDs
+            // it[num] - Access the LED at index num.
+            // Set the LED at num to the given r, g, b values
+            // it[num] = Color(r, g, b);
+            // Get the color at index num (Color instance)
+            // it[num].get();
+
+            // Example: Simple color wipe
+            for (int i = it.size() - 1; i > 0; i--) {
+              it[i] = it[i - 1].get();
+            }
+            it[0] = Color::random_color();
+
+            // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+            it.range(0, 50) = Color::BLACK;
+            it.all().fade_to_black(10);

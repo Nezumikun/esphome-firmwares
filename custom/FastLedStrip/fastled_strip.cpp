@@ -269,6 +269,11 @@ namespace esphome {
         uint8_t prevIndex = effectIndex;
         if (firstPass) {
           effectIndex = (effectIndex + 1) % 6;
+            if (it.size() == 300) {
+              if (effectIndex == 3) {
+                effectIndex = 4;
+              }
+            }
           if (effectIndex == 0) {
             firstPass = false;
             effectIndex = prevIndex;
@@ -279,6 +284,11 @@ namespace esphome {
         if (!firstPass) {
           if ((random8() & 1) == 1) {
             effectIndex = random8(5);
+            if (it.size() == 300) {
+              if (effectIndex == 3) {
+                effectIndex = 5;
+              }
+            }
             if (prevIndex != effectIndex) {
               ESP_LOGD("fastled_demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
             }
