@@ -61,3 +61,7 @@ packages:
   uptime: !include packages/uptime.yaml
   wifi_info: !include packages/wifi_info.yaml
   clock: !include packages/clock.yaml
+
+logger:
+  logs:
+    switch: INFO

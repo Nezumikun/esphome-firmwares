@@ -56,3 +56,6 @@ switch:
     turn_off_action:
     - switch.turn_off: green_led
 
+logger:
+  logs:
+    switch: INFO
