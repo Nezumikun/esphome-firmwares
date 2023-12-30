@@ -59,7 +59,7 @@ namespace esphome {
     void FastLedStripComponent::sinelon(AddressableLight &it, bool initial_run) {
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
-        fadeValue = 20 * 64 / it.size();
+        fadeValue = 12 * 64 / it.size();
         if (fadeValue == 0) fadeValue = 1;
         ESP_LOGD("fastled_sinelon", "Fade value = %d", fadeValue);
       }
@@ -256,7 +256,7 @@ namespace esphome {
     void FastLedStripComponent::demo(AddressableLight &it, bool initial_run) {
       static uint8_t effectIndex;
       const char* effectNames[] = {
-        "Rainbow", "Confetti", "Sinelon", "Beats", "Juggle", "Noise"
+        "Rainbow", "Confetti", "Juggle", "Noise", "Sinelon", "Beats"
       };
       if (initial_run) {
         firstPass = true;
@@ -267,28 +267,19 @@ namespace esphome {
       }
       EVERY_N_SECONDS(20) { 
         uint8_t prevIndex = effectIndex;
+        uint8_t limit = (it.size() > 100) ? 3 : 5;
         if (firstPass) {
-          effectIndex = (effectIndex + 1) % 6;
-            if (it.size() == 300) {
-              if (effectIndex == 3) {
-                effectIndex = 4;
-              }
-            }
-          if (effectIndex == 0) {
+          effectIndex = effectIndex + 1;
+          if (effectIndex > limit) {
             firstPass = false;
-            effectIndex = prevIndex;
+            ESP_LOGD("fastled_demo", "First pass finished");
           } else {
             ESP_LOGD("fastled_demo", "Start effect [%d] %s in first pass", effectIndex, effectNames[effectIndex]);
           }
         }
         if (!firstPass) {
           if ((random8() & 1) == 1) {
-            effectIndex = random8(5);
-            if (it.size() == 300) {
-              if (effectIndex == 3) {
-                effectIndex = 5;
-              }
-            }
+            effectIndex = random8(limit);
             if (prevIndex != effectIndex) {
               ESP_LOGD("fastled_demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
             }
@@ -303,16 +294,16 @@ namespace esphome {
           confetti(it, initial_run);
           break;
         case 2:
-          sinelon(it, initial_run);
-          break;
-        case 3:
-          beats(it, initial_run);
-          break;
-        case 4:
           juggle(it, initial_run);
           break;
-        case 5:
+        case 3:
           noise(it, initial_run);
+          break;
+        case 4:
+          sinelon(it, initial_run);
+          break;
+        case 5:
+          beats(it, initial_run);
           break;
         default:
           break;

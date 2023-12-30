@@ -1,12 +1,12 @@
 substitutions:
-  devicename: xmass_tree_strip
+  devicename: test_fastled_strip
   platform: ESP8266
-#  board: nodemcuv2
-  board: esp01_1m
-  devicedescr: XMass Tree Strip
-  strip_num_leds: '150'
-  strip_rgb_order: RGB
-  strip_pin: GPIO0
+  board: nodemcuv2
+#  board: esp01_1m
+  devicedescr: FastLED Strip
+  strip_num_leds: '30'
+  strip_rgb_order: GRB
+  strip_pin: GPIO4
   alive_pin: GPIO2
 
 esphome:
@@ -17,8 +17,10 @@ esp8266:
   framework:
     version: 2.7.4
 
+web_server:
+  port: 80
+
 packages:
-  base_settings: !include packages/base_settings.yaml
   wifi: !include packages/network.yaml
   uptime: !include packages/uptime.yaml
   wifi_info: !include packages/wifi_info.yaml
