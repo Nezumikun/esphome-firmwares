@@ -2,11 +2,12 @@ substitutions:
   devicename: xmass_tree_strip
   platform: ESP8266
 #  board: nodemcuv2
-  board: esp01_1m
+#  board: esp01_1m
+  board: esp12e
   devicedescr: XMass Tree Strip
   strip_num_leds: '150'
   strip_rgb_order: RGB
-  strip_pin: GPIO0
+  strip_pin: GPIO4
   alive_pin: GPIO2
 
 esphome:

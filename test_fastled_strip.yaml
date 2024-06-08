@@ -4,9 +4,9 @@ substitutions:
   board: nodemcuv2
 #  board: esp01_1m
   devicedescr: FastLED Strip
-  strip_num_leds: '30'
-  strip_rgb_order: GRB
-  strip_pin: GPIO4
+#  strip_num_leds: '30'
+#  strip_rgb_order: GRB
+#  strip_pin: GPIO4
   alive_pin: GPIO2
 
 esphome:
@@ -22,9 +22,9 @@ web_server:
 
 packages:
   wifi: !include packages/network.yaml
-  uptime: !include packages/uptime.yaml
-  wifi_info: !include packages/wifi_info.yaml
-  fastled_strip: !include packages/fastled_strip.yaml
+#  uptime: !include packages/uptime.yaml
+#  wifi_info: !include packages/wifi_info.yaml
+#  fastled_strip: !include packages/fastled_strip.yaml
   alive_led: !include packages/alive_led.yaml
 
 logger:
