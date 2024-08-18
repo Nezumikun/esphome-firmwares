@@ -1,12 +1,12 @@
 substitutions:
-  devicename: test_fastled_strip
+  devicename: test_led_strip
   platform: ESP8266
   board: nodemcuv2
 #  board: esp01_1m
-  devicedescr: FastLED Strip
-#  strip_num_leds: '30'
-#  strip_rgb_order: GRB
-#  strip_pin: GPIO4
+  devicedescr: LED Strip
+  strip_num_leds: '30'
+  strip_rgb_order: GRB
+  strip_pin: GPIO4
   alive_pin: GPIO2
 
 esphome:
@@ -14,17 +14,16 @@ esphome:
 
 esp8266:
   board: ${board}
-  framework:
-    version: 2.7.4
 
 web_server:
   port: 80
 
 packages:
   wifi: !include packages/network.yaml
+  base_settings: !include packages/base_settings.yaml
 #  uptime: !include packages/uptime.yaml
 #  wifi_info: !include packages/wifi_info.yaml
-#  fastled_strip: !include packages/fastled_strip.yaml
+  fastled_strip: !include packages/neopixel_strip.yaml
   alive_led: !include packages/alive_led.yaml
 
 logger:

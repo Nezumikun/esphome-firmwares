@@ -1,6 +1,6 @@
 esphome:
   on_boot:
-    priority: 800
+    priority: 600
     then:
       - switch.turn_on: alive_blink
 
@@ -25,7 +25,7 @@ switch:
             condition:
               wifi.connected:
             else:
-              - switch.toggle: alive_led
+        - switch.toggle: alive_led
         - delay: 250ms
     turn_off_action:
     - switch.turn_off: alive_led
