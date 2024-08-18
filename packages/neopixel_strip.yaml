@@ -64,9 +64,9 @@ light:
           lambda: |-
             auto ptr = id(strip);
             static_cast<Nezumikun::LedStripEffectsComponent*>(ptr)->beats(it, initial_run);
-    #   - addressable_lambda:
-    #       name: "Noise"
-    #       update_interval: 10ms
-    #       lambda: |-
-    #         auto ptr = id(strip);
-    #         static_cast<Nezumikun::LedStripEffectsComponent*>(ptr)->noise(it, initial_run);
+      - addressable_lambda:
+          name: "Noise"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::LedStripEffectsComponent*>(ptr)->noise(it, initial_run);

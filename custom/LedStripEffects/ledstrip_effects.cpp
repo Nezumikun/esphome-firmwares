@@ -178,50 +178,55 @@ namespace esphome {
     //   255,  42,  0,  0
     // };
 
-    // void LedStripEffectsComponent::noise(AddressableLight &it, bool initial_run) {
-    //   static uint16_t x = 0;
-    //   static uint16_t y = 0;
-    //   static uint8_t subMode = 0;
-    //   EVERY_N_SECONDS(20) {
-    //     subMode = (subMode + 1) % 7;
-    //     initial_run = true;
-    //   }
-    //   if (initial_run) {
-    //     ESP_LOGD("fastled_noise", "Submode = %s", subMode == 0 ? "XMas" : subMode == 1 ? "Heat" : subMode == 2 ? "Party"
-    //       : subMode == 3 ? "Rainbow" : subMode == 4 ? "Lava" : subMode == 5 ? "Cloud" : subMode == 6 ? "Aurora"
-    //       : "Unknown"
-    //     );
-    //   }
-    //   init_fastled_buffer(it.size());
-    //   for(uint16_t i = 0; i < it.size(); i++) {
-    //     switch(subMode) {
-    //       case 0:
-    //         buffer[i] = ColorFromPalette((CRGBPalette16) xmas_gp, inoise8(i * 40, y));
-    //         break;
-    //       case 1:
-    //         buffer[i] = ColorFromPalette(HeatColors_p, inoise8(i * 40, y));
-    //         break;
-    //       case 2:
-    //         buffer[i] = ColorFromPalette(PartyColors_p, inoise8(i * 40, y));
-    //         break;
-    //       case 3:
-    //         buffer[i] = ColorFromPalette(RainbowColors_p, inoise8(i * 40, y));
-    //         break;
-    //       case 4:
-    //         buffer[i] = ColorFromPalette(LavaColors_p, inoise8(i * 40, y));
-    //         break;
-    //       case 5:
-    //         buffer[i] = ColorFromPalette(CloudColors_p, inoise8(i * 40, y));
-    //         break;
-    //       case 6:
-    //         buffer[i] = ColorFromPalette((CRGBPalette16) aurora_gp, inoise8(i * 40, y));
-    //         break;
-    //     }
-    //   }
-    //   x++;
-    //   y += 10;
-    //   copy_fastled_buffer(it);
-    // }
+    void LedStripEffectsComponent::noise(esphome::light::AddressableLight &it, bool initial_run) {
+      static uint16_t x = 0;
+      static uint16_t y = 0;
+      static uint8_t subMode = 0;
+      static uint32_t prevTime = 0;
+      uint32_t now = millis();
+      if (initial_run) prevTime = now;
+      if (prevTime + 20 * 1000 <= now) {
+        if ((random_uint32() & 1) == 1) {
+          subMode = random8(4);
+          initial_run = true;
+        }
+        prevTime = now;
+      }
+      if (initial_run) {
+        ESP_LOGD("noise", "Submode = %s", subMode == 0 ? "Party" : subMode == 1 ? "Heat" : subMode == 2 ? "Cloud"
+          : subMode == 3 ? "Rainbow" : subMode == 4 ? "Lava" : subMode == 5 ? "XMas" : subMode == 6 ? "Aurora"
+          : "Unknown"
+        );
+      }
+      for(uint16_t i = 0; i < it.size(); i++) {
+        switch(subMode) {
+          case 0:
+            buffer[i].rgb = color_from_palette(palettePartyColors, inoise8(i * 40, y), it.size());
+            break;
+          case 1:
+            buffer[i].rgb = color_from_palette(paletteHeatColors, inoise8(i * 40, y), it.size());
+            break;
+          case 2:
+            buffer[i].rgb = color_from_palette(paletteCloudColors, inoise8(i * 40, y), it.size());
+            break;
+          case 3:
+            buffer[i].rgb = color_from_palette(paletteRainbowColors, inoise8(i * 40, y), it.size());
+            break;
+          case 4:
+            buffer[i].rgb = color_from_palette(paletteLavaColors, inoise8(i * 40, y), it.size());
+            break;
+          // case 5:
+          //   buffer[i] = ColorFromPalette((CRGBPalette16) xmas_gp, inoise8(i * 40, y));
+          //   break;
+          // case 6:
+          //   buffer[i] = ColorFromPalette((CRGBPalette16) aurora_gp, inoise8(i * 40, y));
+          //   break;
+        }
+      }
+      x++;
+      y += 10;
+      copy_buffer_rgb(it);
+    }
 
      void LedStripEffectsComponent::test(esphome::light::AddressableLight &it, bool initial_run) {
       static uint16_t value = 0;
