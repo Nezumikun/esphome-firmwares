@@ -31,6 +31,7 @@ namespace esphome {
         void beats(esphome::light::AddressableLight &it, bool initial_run);
         void juggle(esphome::light::AddressableLight &it, bool initial_run);
         void noise(esphome::light::AddressableLight &it, bool initial_run);
+        void color_cycle(esphome::light::AddressableLight &it, bool initial_run);
         void demo(esphome::light::AddressableLight &it, bool initial_run);
     };
   }

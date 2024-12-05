@@ -41,6 +41,12 @@ light:
             auto ptr = id(strip);
             static_cast<Nezumikun::LedStripEffectsComponent*>(ptr)->rainbow(it, initial_run);
       - addressable_lambda:
+          name: "Color Cycle"
+          update_interval: 10ms
+          lambda: |-
+            auto ptr = id(strip);
+            static_cast<Nezumikun::LedStripEffectsComponent*>(ptr)->color_cycle(it, initial_run);
+      - addressable_lambda:
           name: "Confetti"
           update_interval: 10ms
           lambda: |-

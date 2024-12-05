@@ -86,6 +86,51 @@ namespace esphome {
       copy_buffer_hsv(it);
     }
 
+    void LedStripEffectsComponent::color_cycle(esphome::light::AddressableLight &it, bool initial_run) {
+      static bool withGlitter = false;
+      static uint16_t step = 0;
+      static uint16_t hue16 = 0;
+      static uint8_t bright = 255;
+      static bool fade = true;
+      static uint32_t prevTime = -20 * 1000;
+      uint32_t now = millis();
+      if (prevTime + 20 * 1000 <= now) {
+        if (withGlitter != (random8() & 1)) {
+          withGlitter = !withGlitter;
+          ESP_LOGD("color_cycle", "Breath %s", withGlitter ? "ON" : "OFF");
+          if (!withGlitter) {
+            bright = 255;
+            fade = true;
+          }
+        }
+        prevTime = now;
+      }
+      if (step == 0) {
+        step = 1;
+        ESP_LOGD("color_cycle", "Start");
+      }
+      for (int i = 0; i < it.size(); i++) {
+        buffer[i].hsv.hue = (uint8_t)(hue16 / 5);
+        buffer[i].hsv.saturation = 255;
+        buffer[i].hsv.value = withGlitter ? bright : 255;
+      }
+      // if(withGlitter && random8() < 60) {
+      //    buffer[random16(it.size())].hsv.hue = 0;
+      //    buffer[random16(it.size())].hsv.saturation = 0;
+      //    buffer[random16(it.size())].hsv.value = 255;
+      // }
+      hue16++;
+      hue16 %= 255 * 5;
+      if (fade) {
+        bright -= 3;
+        if (bright < 50) fade = false;
+      } else {
+        bright += 3;
+        if (bright == 255) fade = true;
+      }
+      copy_buffer_hsv(it);
+    }
+
     void LedStripEffectsComponent::confetti(esphome::light::AddressableLight &it, bool initial_run) {
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
@@ -326,7 +371,7 @@ namespace esphome {
       uint32_t now = millis();
       if (prevTime + 20 * 1000 <= now) {
         uint8_t prevIndex = effectIndex;
-        uint8_t limit = (it.size() > 100) ? 3 : 4;
+        uint8_t limit = (it.size() > 100) ? 4 : 5;
         if (firstPass) {
           effectIndex++;
           if (effectIndex > limit) {
@@ -358,9 +403,12 @@ namespace esphome {
           juggle(it, initial_run);
           break;
         case 3:
-          sinelon(it, initial_run);
+          color_cycle(it, initial_run);
           break;
         case 4:
+          sinelon(it, initial_run);
+          break;
+        case 5:
           beats(it, initial_run);
           break;
         // case 5:
