@@ -21,8 +21,14 @@ sensor:
               seconds = seconds % 3600;
               int minutes = seconds /  60;
               seconds = seconds % 60;
-              return (
-                (days ? String(days) + " д. " : "") +
-                (hours ? String(hours) + " ч. " : "") +
-                (String(minutes) + " мин.")
-              ).c_str();
+              static char res[50];
+              if (days > 0) {
+                sprintf(res, "%i д. %i ч. %i мин.", days, hours, minutes);
+              }
+              else if (hours > 0) {
+                sprintf(res, "%i ч. %i мин.", hours, minutes);
+              }
+              else {
+                sprintf(res, "%i мин.", minutes);
+              }
+              return res;

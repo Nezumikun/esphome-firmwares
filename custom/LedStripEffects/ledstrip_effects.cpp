@@ -20,7 +20,8 @@ namespace esphome {
 
     void LedStripEffectsComponent::copy_buffer_hsv(esphome::light::AddressableLight &it) {
       for (uint16_t i = 0; i < it.size(); i++) {
-        it[i].set_hsv(esphome::light::ESPHSVColor(buffer[i].hsv.hue, buffer[i].hsv.saturation, buffer[i].hsv.value));
+        RGB temp = hsv_to_rgb(buffer[i].hsv);
+        it[i].set_rgb(temp.red, temp.green, temp.blue);
       }
       hue++;
     }
@@ -58,14 +59,15 @@ namespace esphome {
     }
 
     void LedStripEffectsComponent::rainbow(esphome::light::AddressableLight &it, bool initial_run) {
-      static bool withGlitter = false;
+      static uint8_t flag = 0;
       static uint16_t step = 0;
       static uint32_t prevTime = -20 * 1000;
       uint32_t now = millis();
       if (prevTime + 20 * 1000 <= now) {
-        if (withGlitter != (random8() & 1)) {
-          withGlitter = !withGlitter;
-          ESP_LOGD("rainbow", "Glitter %s", withGlitter ? "ON" : "OFF");
+        uint8_t newFlag = random8();
+        if (flag != newFlag) {
+          flag = newFlag;
+          ESP_LOGD("rainbow", "Glitter = %s, Direction = %s", ((flag & 1) == 1) ? "ON" : "OFF", ((flag & 2) == 0) ? "FORWARD" : "BACKWARD");
         }
         prevTime = now;
       }
@@ -73,23 +75,24 @@ namespace esphome {
         step = 255 * 255 / it.size();
         ESP_LOGD("rainbow", "Step = %i", step);
       }
+      if ((flag & 2) > 0) {
+        hue -= 2;
+      }
       for (int i = 0; i < it.size(); i++) {
-        buffer[i].hsv.hue = hue + (step * i / 256);
-        buffer[i].hsv.saturation = 255;
-        buffer[i].hsv.value = 255;
+        set_color_from_wheel_to_rgb(&(buffer[i].rgb), hue + (step * i / 256), 255);
       }
-      if(withGlitter && random8() < 60) {
-         buffer[random16(it.size())].hsv.hue = 0;
-         buffer[random16(it.size())].hsv.saturation = 0;
-         buffer[random16(it.size())].hsv.value = 255;
+      if (((flag & 1) == 1) && random8() < 60) {
+        uint16_t glitterIndex = random16(it.size() - 1);
+        buffer[glitterIndex].rgb.red = 255;
+        buffer[glitterIndex].rgb.green = 255;
+        buffer[glitterIndex].rgb.blue = 255;
       }
-      copy_buffer_hsv(it);
+      copy_buffer_rgb(it);
     }
 
     void LedStripEffectsComponent::color_cycle(esphome::light::AddressableLight &it, bool initial_run) {
       static bool withGlitter = false;
       static uint16_t step = 0;
-      static uint16_t hue16 = 0;
       static uint8_t bright = 255;
       static bool fade = true;
       static uint32_t prevTime = -20 * 1000;
@@ -110,22 +113,15 @@ namespace esphome {
         ESP_LOGD("color_cycle", "Start");
       }
       for (int i = 0; i < it.size(); i++) {
-        buffer[i].hsv.hue = (uint8_t)(hue16 / 5);
+        buffer[i].hsv.hue = hue;
         buffer[i].hsv.saturation = 255;
         buffer[i].hsv.value = withGlitter ? bright : 255;
       }
-      // if(withGlitter && random8() < 60) {
-      //    buffer[random16(it.size())].hsv.hue = 0;
-      //    buffer[random16(it.size())].hsv.saturation = 0;
-      //    buffer[random16(it.size())].hsv.value = 255;
-      // }
-      hue16++;
-      hue16 %= 255 * 5;
       if (fade) {
-        bright -= 3;
-        if (bright < 50) fade = false;
+        bright -= 1;
+        if (bright == 0) fade = false;
       } else {
-        bright += 3;
+        bright += 1;
         if (bright == 255) fade = true;
       }
       copy_buffer_hsv(it);
@@ -149,7 +145,7 @@ namespace esphome {
     void LedStripEffectsComponent::sinelon(esphome::light::AddressableLight &it, bool initial_run) {
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
-        fadeValue = 6 * 64 / it.size();
+        fadeValue = 12 * 64 / it.size();
         if (fadeValue == 0) fadeValue = 1;
         ESP_LOGD("sinelon", "Fade value = %d", fadeValue);
       }
@@ -356,7 +352,7 @@ namespace esphome {
     void LedStripEffectsComponent::demo(esphome::light::AddressableLight &it, bool initial_run) {
       static uint8_t effectIndex = -1;
       const char* effectNames[] = {
-        "Rainbow", "Confetti", "Juggle", "Sinelon", "Beats", "Noise"
+        "Rainbow", "Confetti", "Juggle", "Color Cycle", "Sinelon", "Beats", "Noise"
       };
       init_buffer(it.size());
       if (initial_run) {
@@ -371,7 +367,7 @@ namespace esphome {
       uint32_t now = millis();
       if (prevTime + 20 * 1000 <= now) {
         uint8_t prevIndex = effectIndex;
-        uint8_t limit = (it.size() > 100) ? 4 : 5;
+        uint8_t limit = (it.size() > 100) ? 6 : 6;
         if (firstPass) {
           effectIndex++;
           if (effectIndex > limit) {
@@ -384,7 +380,7 @@ namespace esphome {
         }
         if (!firstPass) {
           if ((random8() & 1) == 1) {
-            effectIndex = random8(limit);
+            effectIndex = random8(limit - 1);
             if (prevIndex != effectIndex) {
               ESP_LOGD("demo", "Start effect [%d] %s", effectIndex, effectNames[effectIndex]);
             }
@@ -411,9 +407,9 @@ namespace esphome {
         case 5:
           beats(it, initial_run);
           break;
-        // case 5:
-        //   noise(it, initial_run);
-        //   break;
+        case 6:
+          noise(it, initial_run);
+          break;
         default:
           break;
       }

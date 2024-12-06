@@ -1,59 +1,69 @@
 #include "color.h"
 #include "math.h"
 
+#define fade8(x, b)     (((uint16_t)(x) * ((b) + 1)) >> 8)
+
 namespace esphome {
   namespace Nezumikun {
+    void set_color_from_wheel_to_rgb(RGB *rgb, uint8_t color, uint8_t bright) {
+      uint8_t r, g, b;
+      uint8_t shift;
+      if (color > 170) {
+          shift = (color - 170) * 3;
+          r = shift;
+          g = 0;
+          b = 255 - shift;
+      } else if (color > 85) {
+          shift = (color - 85) * 3;
+          r = 0;
+          g = 255 - shift;
+          b = shift;
+      } else {
+          shift = color * 3;
+          r = 255 - shift;
+          g = shift;
+          b = 0;
+      }
+      if (bright != 255) {
+          r = fade8(r, bright);
+          g = fade8(g, bright);
+          b = fade8(b, bright);
+      }
+      rgb->red = r;
+      rgb->blue = b;
+      rgb->green = g;
+    }
+
     RGB hsv_to_rgb(HSV hsv) {
       RGB out = { 0, 0, 0 };
-      double      hh, p, q, t, ff;
-      long        i;
-      if (hsv.saturation <= 0.0) {       // < is bogus, just shuts up warnings
-          out.red = hsv.value;
-          out.green = hsv.value;
-          out.blue = hsv.value;
-          return out;
+      uint8_t r, g, b;
+      uint8_t color = hsv.hue;
+      uint8_t bright = hsv.value;
+      uint8_t shift;
+      if (color > 170) {
+          shift = (color - 170) * 3;
+          r = shift;
+          g = 0;
+          b = 255 - shift;
+      } else if (color > 85) {
+          shift = (color - 85) * 3;
+          r = 0;
+          g = 255 - shift;
+          b = shift;
+      } else {
+          shift = color * 3;
+          r = 255 - shift;
+          g = shift;
+          b = 0;
       }
-      hh = (double)hsv.hue * 360 / 256;
-      if(hh >= 360.0) hh = 0.0;
-      hh /= 60.0;
-      i = (long)hh;
-      ff = hh - i;
-      p = hsv.value * (1.0 - hsv.saturation);
-      q = hsv.value * (1.0 - (hsv.saturation * ff));
-      t = hsv.value * (1.0 - (hsv.saturation * (1.0 - ff)));
-      switch(i) {
-      case 0:
-          out.red = hsv.value;
-          out.green = t;
-          out.blue = p;
-          break;
-      case 1:
-          out.red = q;
-          out.green = hsv.value;
-          out.blue = p;
-          break;
-      case 2:
-          out.red = p;
-          out.green = hsv.value;
-          out.blue = t;
-          break;
-      case 3:
-          out.red = p;
-          out.green = q;
-          out.blue = hsv.value;
-          break;
-      case 4:
-          out.red = t;
-          out.green = p;
-          out.blue = hsv.value;
-          break;
-      case 5:
-      default:
-          out.red = hsv.value;
-          out.green = p;
-          out.blue = q;
-          break;
+      if (bright != 255) {
+          r = fade8(r, bright);
+          g = fade8(g, bright);
+          b = fade8(b, bright);
       }
+      out.red = r;
+      out.blue = b;
+      out.green = g;
       return out;
     }
 

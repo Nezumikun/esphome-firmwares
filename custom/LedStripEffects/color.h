@@ -23,6 +23,7 @@ namespace esphome {
     } color;
 
     RGB hsv_to_rgb(HSV hsv);
+    void set_color_from_wheel_to_rgb(RGB *rgb, uint8_t color, uint8_t bright);
 
     typedef RGB PaletteRGB16[16];
     
