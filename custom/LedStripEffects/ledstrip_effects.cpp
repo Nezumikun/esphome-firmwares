@@ -119,7 +119,7 @@ namespace esphome {
       }
       if (fade) {
         bright -= 1;
-        if (bright == 0) fade = false;
+        if (bright >= 50) fade = false;
       } else {
         bright += 1;
         if (bright == 255) fade = true;
@@ -161,14 +161,14 @@ namespace esphome {
       // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
       static uint8_t koefficient = 0;
       if (koefficient == 0) {
-        koefficient = 10 * it.size() / 64;
+        koefficient = 20 * it.size() / 64;
         if (koefficient == 0) koefficient = 1;
         ESP_LOGD("beats", "koefficient = %d", koefficient);
       }
       const uint8_t BeatsPerMinute = 62;
       uint8_t beat = beatsin8(BeatsPerMinute, 64, 255);
       for (int i = 0; i < it.size(); i++) { //9948
-        buffer[i].rgb = color_from_palette(palettePartyColors, hue + (i*2), it.size(), beat - hue +(i*koefficient));
+        buffer[i].rgb = color_from_palette(palettePartyColors, hue + i, it.size(), beat - hue + i);
       }
       copy_buffer_rgb(it);
     }
@@ -178,7 +178,7 @@ namespace esphome {
       // eight colored dots, weaving in and out of sync with each other
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
-        fadeValue = 5 * 64 / it.size();
+        fadeValue = 20 * 64 / it.size();
         if (fadeValue == 0) fadeValue = 1;
         ESP_LOGD("fastled_juggle", "Fade value = %d", fadeValue);
       }
