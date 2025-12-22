@@ -20,7 +20,7 @@ namespace esphome {
         void copy_buffer_hsv(esphome::light::AddressableLight &it);
         void fill_solid_rgb(uint8_t r, uint8_t g, uint8_t b, uint16_t size);
         void fade_to_black_hsv(uint8_t step, uint16_t size);
-        void fade_to_black_rgb(uint8_t percent, uint16_t size);
+        void fade_to_black_rgb_in_percent(uint8_t percent, uint16_t size);
         void test(esphome::light::AddressableLight &it, bool initial_run);
       public:
         void setup() override {}
@@ -32,6 +32,7 @@ namespace esphome {
         void juggle(esphome::light::AddressableLight &it, bool initial_run);
         void noise(esphome::light::AddressableLight &it, bool initial_run);
         void color_cycle(esphome::light::AddressableLight &it, bool initial_run);
+        void pixel_drop(esphome::light::AddressableLight &it, bool initial_run);
         void demo(esphome::light::AddressableLight &it, bool initial_run);
     };
   }

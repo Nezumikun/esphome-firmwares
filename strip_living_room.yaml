@@ -1,0 +1,30 @@
+substitutions:
+  devicename: strip_living_room
+  platform: ESP8266
+#  board: nodemcuv2
+#  board: esp01_1m
+  board: esp12e
+  devicedescr: FastLED Strip
+  strip_num_leds: '300'
+  strip_rgb_order: GRB
+  strip_pin: GPIO4
+  alive_pin: GPIO2
+
+esphome:
+  name: ${devicename}
+
+esp8266:
+  board: ${board}
+
+packages:
+  base_settings: !include packages/base_settings.yaml
+  wifi: !include packages/network.yaml
+  uptime: !include packages/uptime.yaml
+  wifi_info: !include packages/wifi_info.yaml
+  fastled_strip: !include packages/neopixel_strip.yaml
+  alive_led: !include packages/alive_led.yaml
+
+logger:
+  logs:
+    sensor: ERROR
+    text_sensor: ERROR

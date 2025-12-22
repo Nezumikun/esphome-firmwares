@@ -44,14 +44,14 @@ namespace esphome {
       }
     }
 
-    void LedStripEffectsComponent::fade_to_black_rgb(uint8_t percent, uint16_t size) {
+    void LedStripEffectsComponent::fade_to_black_rgb_in_percent(uint8_t percent, uint16_t size) {
       for (int i = 0; i < size; i++) {
         uint8_t delta_r = (uint8_t)((uint16_t)buffer[i].rgb.red * percent / 100);
-        if (delta_r == 0) delta_r = 1;
+        if ((delta_r == 0) && (buffer[i].rgb.red > 0)) delta_r = 1;
         uint8_t delta_g = (uint8_t)((uint16_t)buffer[i].rgb.green * percent / 100);
-        if (delta_g == 0) delta_g = 1;
+        if ((delta_g == 0) && (buffer[i].rgb.green > 0)) delta_g = 1;
         uint8_t delta_b = (uint8_t)((uint16_t)buffer[i].rgb.blue * percent / 100);
-        if (delta_b == 0) delta_b = 1;
+        if ((delta_b == 0) && (buffer[i].rgb.blue > 0)) delta_b = 1;
         buffer[i].rgb.red -= delta_r;
         buffer[i].rgb.green -= delta_g;
         buffer[i].rgb.blue -= delta_b;
@@ -60,26 +60,26 @@ namespace esphome {
 
     void LedStripEffectsComponent::rainbow(esphome::light::AddressableLight &it, bool initial_run) {
       static uint8_t flag = 0;
-      static uint16_t step = 0;
+      static float step = 0;
+      if (step == 0) {
+        step = (float)255 / it.size();
+        if (step == 0) step = 1;
+      }
       static uint32_t prevTime = -20 * 1000;
       uint32_t now = millis();
       if (prevTime + 20 * 1000 <= now) {
         uint8_t newFlag = random8();
         if (flag != newFlag) {
           flag = newFlag;
-          ESP_LOGD("rainbow", "Glitter = %s, Direction = %s", ((flag & 1) == 1) ? "ON" : "OFF", ((flag & 2) == 0) ? "FORWARD" : "BACKWARD");
+          ESP_LOGD("rainbow", "Glitter = %s, Direction = %s, Step = %0.2f", ((flag & 1) == 1) ? "ON" : "OFF", ((flag & 2) == 0) ? "FORWARD" : "BACKWARD", step);
         }
         prevTime = now;
-      }
-      if (step == 0) {
-        step = 255 * 255 / it.size();
-        ESP_LOGD("rainbow", "Step = %i", step);
       }
       if ((flag & 2) > 0) {
         hue -= 2;
       }
       for (int i = 0; i < it.size(); i++) {
-        set_color_from_wheel_to_rgb(&(buffer[i].rgb), hue + (step * i / 256), 255);
+        set_color_from_wheel_to_rgb(&(buffer[i].rgb), hue + (i * step), 255);
       }
       if (((flag & 1) == 1) && random8() < 60) {
         uint16_t glitterIndex = random16(it.size() - 1);
@@ -91,31 +91,31 @@ namespace esphome {
     }
 
     void LedStripEffectsComponent::color_cycle(esphome::light::AddressableLight &it, bool initial_run) {
-      static bool withGlitter = false;
+      static uint8_t flag = 0;
       static uint16_t step = 0;
       static uint8_t bright = 255;
       static bool fade = true;
       static uint32_t prevTime = -20 * 1000;
       uint32_t now = millis();
       if (prevTime + 20 * 1000 <= now) {
-        if (withGlitter != (random8() & 1)) {
-          withGlitter = !withGlitter;
-          ESP_LOGD("color_cycle", "Breath %s", withGlitter ? "ON" : "OFF");
-          if (!withGlitter) {
+        uint8_t newFlag = random8();
+        if (flag != newFlag) {
+          flag = newFlag;
+          ESP_LOGD("color_cycle", "Breath = %s, Direction = %s", ((flag & 1) == 1) ? "ON" : "OFF", ((flag & 2) == 0) ? "FORWARD" : "BACKWARD");
+          if ((flag & 1) == 0) {
             bright = 255;
             fade = true;
           }
         }
         prevTime = now;
       }
-      if (step == 0) {
-        step = 1;
-        ESP_LOGD("color_cycle", "Start");
+      if ((flag & 2) > 0) {
+        hue -= 2;
       }
       for (int i = 0; i < it.size(); i++) {
         buffer[i].hsv.hue = hue;
         buffer[i].hsv.saturation = 255;
-        buffer[i].hsv.value = withGlitter ? bright : 255;
+        buffer[i].hsv.value = ((flag & 1) == 1) ? bright : 255;
       }
       if (fade) {
         bright -= 1;
@@ -178,19 +178,19 @@ namespace esphome {
       // eight colored dots, weaving in and out of sync with each other
       static uint8_t fadeValue = 0;
       if (fadeValue == 0) {
-        fadeValue = 20 * 64 / it.size();
+        fadeValue = 5 * 64 / it.size();
         if (fadeValue == 0) fadeValue = 1;
         ESP_LOGD("fastled_juggle", "Fade value = %d", fadeValue);
       }
-      fade_to_black_rgb(fadeValue, it.size());
+      fade_to_black_rgb_in_percent(fadeValue, it.size());
       uint8_t dothue = 0;
       for( int i = 0; i < 8; i++) {
         uint16_t index = beatsin16(i + 7, 0, it.size() - 1);
         HSV hsv = { .hue = dothue, .saturation = 200, .value = 255 };
         RGB rgb = hsv_to_rgb(hsv);
-        if (buffer[index].rgb.red < rgb.red) buffer[index].rgb.red = rgb.red;
-        if (buffer[index].rgb.green < rgb.green) buffer[index].rgb.green = rgb.green;
-        if (buffer[index].rgb.blue < rgb.blue) buffer[index].rgb.blue = rgb.blue;
+        buffer[index].rgb.red = buffer[index].rgb.red / 2 + rgb.red / 2;
+        buffer[index].rgb.green = buffer[index].rgb.green / 2 + rgb.green / 2;
+        buffer[index].rgb.blue = buffer[index].rgb.blue / 2 + rgb.blue / 2;
         dothue += 32;
       }
       copy_buffer_rgb(it);
@@ -269,7 +269,50 @@ namespace esphome {
       copy_buffer_rgb(it);
     }
 
-     void LedStripEffectsComponent::test(esphome::light::AddressableLight &it, bool initial_run) {
+    void LedStripEffectsComponent::pixel_drop(esphome::light::AddressableLight &it, bool initial_run) {
+      static uint16_t fillIndex = 0;
+      static uint16_t pixelIndex = 0;
+      static uint8_t fadeValue = 0;
+      static uint8_t step = 0;
+      if (fadeValue == 0) {
+        fadeValue = 10;
+        step = 3;
+        pixelIndex = it.size();
+        fill_solid_rgb(0, 0, 0, it.size());
+      }
+      --hue;
+      for(uint16_t i = 0; i < fillIndex; i++) {
+        buffer[i].hsv.hue = hue;
+        buffer[i].hsv.saturation = 255;
+        buffer[i].hsv.value = 255;
+      }
+      for(uint16_t i = it.size() -1; i > fillIndex; i--) {
+        if (buffer[i].hsv.value < fadeValue) {
+          buffer[i].hsv.value = 0;
+        } else {
+          buffer[i].hsv.value -= fadeValue;
+        }
+      }
+      buffer[pixelIndex].hsv.hue = hue;
+      buffer[pixelIndex].hsv.saturation = 255;
+      buffer[pixelIndex].hsv.value = 255;
+      if (pixelIndex == fillIndex) {
+        // fill_solid_rgb(0, 0, 0, it.size());
+        pixelIndex = it.size();
+        fillIndex++;
+        if (fillIndex >= pixelIndex) {
+          fillIndex = 0;
+        }
+      }
+      if (pixelIndex > step) {
+        pixelIndex -= step;
+      } else {
+        pixelIndex = 0;
+      }
+      copy_buffer_hsv(it);
+    }
+
+    void LedStripEffectsComponent::test(esphome::light::AddressableLight &it, bool initial_run) {
       static uint16_t value = 0;
       static uint8_t step = 0;
       const uint8_t inc = 3;
@@ -409,6 +452,9 @@ namespace esphome {
           break;
         case 6:
           noise(it, initial_run);
+          break;
+        case 7:
+          pixel_drop(it, initial_run);
           break;
         default:
           break;
