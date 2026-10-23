@@ -1,0 +1,32 @@
+```yaml
+# example configuration:
+
+nezumikun_light_2d:
+  id: light_2d
+  light_id: neopixel_strip
+  width: 6
+  height: 5
+
+light:
+  - platform: neopixelbus
+    variant: WS2812
+    pin: D1
+    num_leds: 30
+    type: GRB
+    name: "WS2812B Light"
+    id: neopixel_strip
+    on_turn_on:
+      - light.control:
+          id: neopixel_strip
+          effect: "Demo"
+    effects:
+      - addressable_lambda:
+          name: "Demo"
+          update_interval: 10ms
+          lambda: |-
+            if (initial_run) {
+              it.all() = Color::BLACK;
+              return;
+            }
+            id(light_2d).set_effect_active(true);
+```
