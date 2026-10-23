@@ -33,7 +33,6 @@ light:
               it.all() = Color::BLACK;
               return;
             }
-            id(light_2d).set_effect_active(true);
 
 # custom_component:
 # - lambda: |-

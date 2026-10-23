@@ -40,42 +40,41 @@ namespace esphome {
       fill_solid(this->leds, this->ledsNumber, color);
     }
 
-    uint8_t Canvas::X(uint8_t x, uint8_t y, bool useRotateSettings) {
-      if (x >= this->getWidth(useRotateSettings)) {
-        x = this->getWidth(useRotateSettings) - 1;
-      }
-      if (y >= this->getHeight(useRotateSettings)) {
-        y = this->getHeight(useRotateSettings) - 1;
-      }
-      return (this->anngle == Rotate::Angle90) ? y
-        : (this->anngle == Rotate::Angle180) ? this->width - 1 - x
-        : (this->anngle == Rotate::Angle270) ? this->width - 1 - y
-        : x;
-    }
-
-    uint8_t Canvas::Y(uint8_t x, uint8_t y, bool useRotateSettings) {
-      if (x >= this->getWidth(useRotateSettings)) {
-        x = this->getWidth(useRotateSettings) - 1;
-      }
-      if (y >= this->getHeight(useRotateSettings)) {
-        y = this->getHeight(useRotateSettings) - 1;
-      }
-      return (this->anngle == Rotate::Angle90) ? this->height - 1 - x
-        : (this->anngle == Rotate::Angle180) ? this->height - 1 - y
-        : (this->anngle == Rotate::Angle270) ? x
-        : y;
-    }
-
-    uint16_t Canvas::XY(uint8_t x, uint8_t y, bool useRotateSettings) {
-      return (uint16_t)this->Y(x, y, useRotateSettings) * this->width + this->X(x, y, useRotateSettings);
-    }
-
     void Canvas::setRotate(Rotate angle) {
       this->anngle = angle;
     }
 
     void Canvas::setRotateRandom() {
       this->anngle = (Rotate) (random8(255) & 0x03);
+    }
+
+    void Canvas::setPixel(uint8_t x, uint8_t y, const RGB color, bool useRotateSettings) {
+      uint16_t led_index = 0;
+      uint8_t lx = x;
+      uint8_t ly = y;
+      if (useRotateSettings) {
+        if (this->anngle == Rotate::Angle180) {
+          lx = this->width - x - 1;
+          ly = this->height - y - 1;
+        }
+        else if (this->anngle == Rotate::Angle90) {
+          lx = y;
+          ly = this->height - x - 1;
+        }
+        else if (this->anngle == Rotate::Angle270) {
+          lx = this->width - y - 1;
+          ly = x;
+        }
+      }
+      led_index = ly * this->width;
+      if ((ly & 1) == 1) {
+        led_index += width - lx - 1;
+      }
+      else {
+        led_index += lx;
+      }
+      // ESP_LOGI("TAG", "X = %i, Y = %i: %i", x, y, led_index);
+      this->leds[led_index] = color;
     }
 
     Canvas::Rotate Canvas::getRotate() {

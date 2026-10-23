@@ -28,10 +28,8 @@ namespace esphome {
         uint16_t getLedsNumber();
         void setBrightness(uint8_t brightness);
         RGB * getLeds();
-        uint8_t X(uint8_t x, uint8_t y, bool useRotateSettings = true);
-        uint8_t Y(uint8_t x, uint8_t y, bool useRotateSettings = true);
-        uint16_t XY(uint8_t x, uint8_t y, bool useRotateSettings = true);
         void fill(const RGB color);
+        void setPixel(uint8_t x, uint8_t y, const RGB color, bool useRotateSettings = true);
         void setRotate(Rotate angle);
         Rotate getRotate();
         void setRotateRandom();
