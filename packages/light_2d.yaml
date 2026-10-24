@@ -27,7 +27,7 @@ light:
     effects:
       - addressable_lambda:
           name: "Demo"
-          update_interval: 10ms
+          update_interval: 500ms
           lambda: |-
             if (initial_run) {
               it.all() = Color::BLACK;

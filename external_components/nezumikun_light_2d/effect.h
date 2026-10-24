@@ -11,7 +11,7 @@ namespace esphome {
         bool is_finished_ = false;
         virtual void effectFinished();
       public:
-        Effect(Canvas & canvas);
+        Effect(Canvas * canvas);
         virtual ~Effect();
         bool isFinished();
         virtual void reset();

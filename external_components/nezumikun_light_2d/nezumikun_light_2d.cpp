@@ -2,7 +2,7 @@
 #include "nezumikun_light_2d.h"
 #include "color.h"
 #include "math.h"
-#include "esphome/components/wifi/wifi_component.h"
+#include "effect_fill.h"
 
 namespace esphome {
 namespace nezumikun_light_2d {
@@ -40,6 +40,10 @@ void NezumikunLight2DComponent::loop() {
     auto canvas = this->get_canvas_();
     if (canvas == nullptr) return;
 
+    if (!this->current_effect_) {
+        this->current_effect_ = new Nezumikun::EffectFill(canvas);
+    }
+
     static uint8_t skip = 4;
     if (--skip == 0) {
         skip = 4;
@@ -47,39 +51,9 @@ void NezumikunLight2DComponent::loop() {
         return;
     }
 
-    Nezumikun::HSV hsv = { .hue = this->hue_, .saturation = 0xff, .value = 0xff };
-    Nezumikun::RGB rgb = Nezumikun::hsv_to_rgb(hsv);
-    
-    static uint8_t hue_step = 1;
-    static uint8_t x = 0;
-    static u_int8_t y = this->canvas_->getHeight();
-    if (x >= this->canvas_->getWidth()) {
-        y++;
-        x = 0;
-    }
-    if (y >= this->canvas_->getHeight()) {
-        Nezumikun::RGB black = { .red = 0, .green = 0, .blue = 0 };
-        this->canvas_->fill(black);
-        this->canvas_->setRotateRandom();
-        hue_step = Nezumikun::random8(10);
-        Nezumikun::Canvas::Rotate rotate = this->canvas_->getRotate();
-        ESP_LOGI(
-            TAG,
-            "Rotate %i (W X H = %i x %i)", 
-            rotate == Nezumikun::Canvas::Rotate::Angle270 ? 270 : rotate == Nezumikun::Canvas::Rotate::Angle180 ? 180 : rotate == Nezumikun::Canvas::Rotate::Angle90 ? 90 : 0,
-            this->canvas_->getWidth(),
-            this->canvas_->getHeight()
-        );
-        y = 0;
-    } else {
-        // ESP_LOGI(TAG, "X = %i, Y = %i: R=%x G=%x B=%x", x, y, rgb.red, rgb.green, rgb.blue);
-        this->canvas_->setPixel(x, y, rgb);
-        x++;
-    }
+    this->current_effect_->loop();
 
     this->show_(addressable_light);
-
-    this->hue_ += hue_step;
     addressable_light->schedule_show();
 }
 

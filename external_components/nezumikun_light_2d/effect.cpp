@@ -3,8 +3,8 @@
 namespace esphome {
   namespace Nezumikun {
 
-    Effect::Effect(Canvas & canvas) {
-      this->canvas_ = &canvas;
+    Effect::Effect(Canvas * canvas) {
+      this->canvas_ = canvas;
     };
 
     Effect::~Effect() {
@@ -23,10 +23,6 @@ namespace esphome {
     };
 
     void Effect::loop() {
-      if (this->is_finished_) {
-        this->is_finished_ = false;
-        this->canvas_->setRotate(Canvas::Rotate::None);
-      }
     }
 
   }
