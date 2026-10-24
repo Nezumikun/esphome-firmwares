@@ -13,11 +13,12 @@ namespace esphome {
     void EffectFill::reset() {
         this->is_finished_ = false;
         this->canvas_->setRotateRandom();
+        this->canvas_->setMirrorFlag(random8() & 1 == 1);
         this->x_ = 0;
         this->y_ = 0;
         RGB black = { .red = 0, .green = 0, .blue = 0 };
         this->canvas_->fill(black);
-        this->hue_step_ = random8(10);
+        this->hue_step_ = random8(30);
     }
 
     void EffectFill::loop() {

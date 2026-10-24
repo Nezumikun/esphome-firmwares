@@ -20,6 +20,7 @@ namespace esphome {
         RGB * leds;
         uint8_t brightness = 100;
         Rotate anngle = Rotate::None;
+        bool is_mirror = false;
       public:
         Canvas(uint8_t width, uint8_t height);
         uint8_t getWidth(bool useRotateSettings = true);
@@ -33,6 +34,8 @@ namespace esphome {
         void setRotate(Rotate angle);
         Rotate getRotate();
         void setRotateRandom();
+        void setMirrorFlag(bool is_mirror);
+        bool getMirrorFlag();
     };
 
   }

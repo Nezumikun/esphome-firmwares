@@ -44,6 +44,14 @@ namespace esphome {
       this->anngle = angle;
     }
 
+    void Canvas::setMirrorFlag(bool is_mirror) {
+      this->is_mirror = is_mirror;
+    }
+
+    bool Canvas::getMirrorFlag() {
+      return this->is_mirror;
+    }
+
     void Canvas::setRotateRandom() {
       this->anngle = (Rotate) (random8(255) & 0x03);
     }
@@ -64,6 +72,14 @@ namespace esphome {
         else if (this->anngle == Rotate::Angle270) {
           lx = this->width - y - 1;
           ly = x;
+        }
+      }
+      if (this->is_mirror) {
+        if ((this->anngle == Rotate::Angle180) || (this->anngle == Rotate::None)) {
+          lx = this->width - lx - 1;
+        }
+        else  {
+          ly = this->height - ly - 1;
         }
       }
       led_index = ly * this->width;

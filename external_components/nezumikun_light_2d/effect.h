@@ -8,7 +8,7 @@ namespace esphome {
     class Effect {
       protected:
         Canvas * canvas_;
-        bool is_finished_ = false;
+        bool is_finished_ = true;
         virtual void effectFinished();
       public:
         Effect(Canvas * canvas);
