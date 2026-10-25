@@ -10,6 +10,7 @@ substitutions:
   alive_pin: GPIO2
   canvas_width: 6
   canvas_height: 5
+  initial_brightness: 25%
 
 esphome:
   name: ${devicename}
