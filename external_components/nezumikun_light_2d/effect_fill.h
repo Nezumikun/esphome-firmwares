@@ -7,6 +7,13 @@ namespace esphome {
 
     class EffectFill : public Effect {
       protected:
+        enum ColorStyle {
+          SOLID,
+          HUE_SHIFT_EACH_DOT,
+          HUE_SHIFT_NEW_LINE,
+          RANDOM_EACH_DOT,
+          RANDOM_NEW_LINE
+        } color_style_;
         uint8_t x_ = 0;
         uint8_t y_ = 0;
         uint8_t hue_ = 0;
