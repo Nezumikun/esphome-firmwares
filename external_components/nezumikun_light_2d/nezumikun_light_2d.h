@@ -3,6 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/light/addressable_light.h"
 #include "canvas.h"
+#include "effect.h"
 
 namespace esphome {
 namespace nezumikun_light_2d {
@@ -36,6 +37,7 @@ class NezumikunLight2DComponent : public Component {
     uint8_t hue_ = 0;
     uint8_t canvas_width_ = 0;
     uint8_t canvas_height_ = 0;
+    Nezumikun::Effect * current_effect_{nullptr};
     Nezumikun::Canvas * canvas_{nullptr};
 };
 

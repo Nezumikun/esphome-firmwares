@@ -9,6 +9,7 @@ namespace esphome {
       this->height = height;
       this->ledsNumber = (uint16_t)width * height;
       this->leds = (RGB *) malloc((width * height) * sizeof(RGB));
+      this->hsv = (HSV *) this->leds;
       this->anngle = Rotate::None;
     }
 
@@ -40,15 +41,51 @@ namespace esphome {
       fill_solid(this->leds, this->ledsNumber, color);
     }
 
+    void Canvas::fillHSV(const HSV color) {
+      RGB rgb = { .red = 0, .green = 0, .blue = 0 };
+      if (this->is_hsv) {
+        rgb.red = color.hue;
+        rgb.green = color.saturation;
+        rgb.blue = color.value;
+      }
+      fill_solid(this->leds, this->ledsNumber, rgb);
+    }
+
+    void Canvas::fadeHSV(u_int8_t delta) {
+      for (uint16_t i = 0; i < this->ledsNumber; i++) {
+        if (this->hsv[i].value < delta) {
+          this->hsv[i].value = 0;
+        } else {
+          this->hsv[i].value -= delta;
+        }
+      }
+    }
+
     void Canvas::setRotate(Rotate angle) {
       this->anngle = angle;
+    }
+
+    void Canvas::setMirrorFlag(bool is_mirror) {
+      this->is_mirror = is_mirror;
+    }
+
+    bool Canvas::getMirrorFlag() {
+      return this->is_mirror;
+    }
+
+    void Canvas::setHSVFlag(bool is_hsv) {
+      this->is_hsv = is_hsv;
+    }
+
+    bool Canvas::getHSVFlag() {
+      return this->is_hsv;
     }
 
     void Canvas::setRotateRandom() {
       this->anngle = (Rotate) (random8(255) & 0x03);
     }
 
-    void Canvas::setPixel(uint8_t x, uint8_t y, const RGB color, bool useRotateSettings) {
+    uint16_t Canvas::getLedIndex(uint8_t x, uint8_t y, bool useRotateSettings) {
       uint16_t led_index = 0;
       uint8_t lx = x;
       uint8_t ly = y;
@@ -66,6 +103,14 @@ namespace esphome {
           ly = x;
         }
       }
+      if (this->is_mirror) {
+        if ((this->anngle == Rotate::Angle180) || (this->anngle == Rotate::None)) {
+          lx = this->width - lx - 1;
+        }
+        else  {
+          ly = this->height - ly - 1;
+        }
+      }
       led_index = ly * this->width;
       if ((ly & 1) == 1) {
         led_index += width - lx - 1;
@@ -73,8 +118,24 @@ namespace esphome {
       else {
         led_index += lx;
       }
+      return led_index;
+    }
+
+    void Canvas::setPixel(uint8_t x, uint8_t y, const RGB color, bool useRotateSettings) {
+      uint16_t led_index = this->getLedIndex(x, y, useRotateSettings);
+      this->is_hsv = false;
       // ESP_LOGI("TAG", "X = %i, Y = %i: %i", x, y, led_index);
       this->leds[led_index] = color;
+    }
+
+    void Canvas::setPixelHSV(uint8_t x, uint8_t y, const HSV color, bool useRotateSettings) {
+      uint16_t led_index = this->getLedIndex(x, y, useRotateSettings);
+      if (this->is_hsv) {
+        this->hsv[led_index] = color;
+      } else {
+        RGB rgb = hsv_to_rgb(color);
+        this->leds[led_index] = rgb;
+      }
     }
 
     Canvas::Rotate Canvas::getRotate() {
