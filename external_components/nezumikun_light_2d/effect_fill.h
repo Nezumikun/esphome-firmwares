@@ -19,6 +19,8 @@ namespace esphome {
         uint8_t hue_ = 0;
         uint8_t hue_step_ = 1;
         bool continue_line_ = false;
+        bool fade = false;
+        u_int8_t fade_step = 25;
         uint8_t width_ = 0;
         uint8_t height_ = 0;
         uint16_t dot_count_ = 0;

@@ -86,13 +86,25 @@ Nezumikun::Canvas* NezumikunLight2DComponent::get_canvas_() {
 }
 
 void NezumikunLight2DComponent::show_(light::AddressableLight* addressable_light) {
-    Nezumikun::RGB * canvas_leds = this->canvas_->getLeds();
-    for (uint16_t led_index = 0; led_index < this->canvas_->getLedsNumber(); led_index++) {
-        uint8_t r = canvas_leds[led_index].red;
-        uint8_t g = canvas_leds[led_index].green;
-        uint8_t b = canvas_leds[led_index].blue;
-        auto pixel = addressable_light->get(led_index);
-        pixel.set(Color(r, g, b));
+    if (this->canvas_->getHSVFlag()) {
+        Nezumikun::HSV * canvas_leds = (Nezumikun::HSV *) this->canvas_->getLeds();
+        for (uint16_t led_index = 0; led_index < this->canvas_->getLedsNumber(); led_index++) {
+            Nezumikun::RGB rgb = hsv_to_rgb(canvas_leds[led_index]);
+            uint8_t r = rgb.red;
+            uint8_t g = rgb.green;
+            uint8_t b = rgb.blue;
+            auto pixel = addressable_light->get(led_index);
+            pixel.set(Color(r, g, b));
+        }
+    } else {
+        Nezumikun::RGB * canvas_leds = this->canvas_->getLeds();
+        for (uint16_t led_index = 0; led_index < this->canvas_->getLedsNumber(); led_index++) {
+            uint8_t r = canvas_leds[led_index].red;
+            uint8_t g = canvas_leds[led_index].green;
+            uint8_t b = canvas_leds[led_index].blue;
+            auto pixel = addressable_light->get(led_index);
+            pixel.set(Color(r, g, b));
+        }
     }
     // for (uint8_t i = 0; i < this->skipCount; i++) {
     // for (uint16_t p = this->skip[i].start; p < this->skip[i].start + this->skip[i].length; p++) {

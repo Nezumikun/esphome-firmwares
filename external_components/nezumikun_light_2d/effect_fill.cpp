@@ -14,14 +14,17 @@ namespace esphome {
       this->is_finished_ = false;
       this->canvas_->setRotateRandom();
       this->canvas_->setMirrorFlag((random8() & 1) == 1);
+      this->canvas_->setHSVFlag(true);
       this->continue_line_ = (random8() & 1) == 1;
+      this->fade = (random8() & 1) == 1;
+      this->fade_step = 10 + random8(15);
       this->x_ = 0;
       this->y_ = 0;
       this->width_ = this->canvas_->getWidth();
       this->height_ = this->canvas_->getHeight();
       this->dot_count_ = 0;
-      RGB black = { .red = 0, .green = 0, .blue = 0 };
-      this->canvas_->fill(black);
+      HSV black = { .hue = 0, .saturation = 0, .value = 0 };
+      this->canvas_->fillHSV(black);
       u_int8_t rnd = random8(5);
       this->color_style_ = (rnd == 0) ? ColorStyle::SOLID
         : (rnd == 1) ? ColorStyle::HUE_SHIFT_EACH_DOT
@@ -51,9 +54,11 @@ namespace esphome {
       if (this->y_ >= this->height_) {
         this->y_ = 0;
       } else {
+        if (this->fade) {
+          this->canvas_->fadeHSV(this->fade_step);
+        }
         HSV hsv = { .hue = this->hue_, .saturation = 0xff, .value = 0xff };
-        RGB rgb = hsv_to_rgb(hsv);
-        this->canvas_->setPixel(this->x_, this->y_, rgb);
+        this->canvas_->setPixelHSV(this->x_, this->y_, hsv);
         this->dot_count_++;
         this->x_ += (this->continue_line_ && ((this->y_ & 1) == 1)) ? -1 : 1;
       }
