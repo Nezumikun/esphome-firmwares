@@ -1,12 +1,15 @@
+substitutions:
+  initial_brightness: 25%
+
 #captive_portal:
 
 # Enable logging
 logger:
 
 # Enable Home Assistant API
-# api:
-#   encryption:
-#     key: !secret api_key
+api:
+  encryption:
+    key: !secret api_key
 
 # ota:
 #   platform: esphome
