@@ -75,5 +75,14 @@ namespace esphome {
       }
     }
 
+    bool EffectFill::wait() {
+      static u_int8_t skip = 4;
+      if (--skip == 0) {
+          skip = 4;
+          return false;
+      } else {
+          return true;
+      }      
+    }
   }
 }

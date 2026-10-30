@@ -38,7 +38,7 @@ namespace esphome {
     };
 
     void Canvas::fill(const RGB color) {
-      fill_solid(this->leds, this->ledsNumber, color);
+      fill_solid(this->leds, (uint16_t)this->width * this->height, color);
     }
 
     void Canvas::fillHSV(const HSV color) {
@@ -48,7 +48,7 @@ namespace esphome {
         rgb.green = color.saturation;
         rgb.blue = color.value;
       }
-      fill_solid(this->leds, this->ledsNumber, rgb);
+      fill_solid(this->leds, (uint16_t)this->width * this->height, rgb);
     }
 
     void Canvas::fadeHSV(u_int8_t delta) {
