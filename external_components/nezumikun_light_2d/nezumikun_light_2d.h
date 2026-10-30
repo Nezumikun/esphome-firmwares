@@ -3,7 +3,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/light/addressable_light.h"
 #include "canvas.h"
-#include "effect.h"
+#include "effects.h"
 
 namespace esphome {
 namespace nezumikun_light_2d {
@@ -25,6 +25,7 @@ class NezumikunLight2DComponent : public Component {
     void set_effect_active(bool active) { this->is_effect_active = active; }
 
   protected:
+    bool is_init = false;
     // Internal members
     light::AddressableLightState* light_strip_{nullptr};
 

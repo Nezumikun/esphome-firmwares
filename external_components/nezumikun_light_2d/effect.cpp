@@ -25,5 +25,9 @@ namespace esphome {
     void Effect::loop() {
     }
 
+    bool Effect::wait() {
+      return false;
+    }
+
   }
 }

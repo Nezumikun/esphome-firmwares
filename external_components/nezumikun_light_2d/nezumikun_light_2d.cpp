@@ -41,17 +41,19 @@ void NezumikunLight2DComponent::loop() {
     if (canvas == nullptr) return;
 
     if (!this->current_effect_) {
-        this->current_effect_ = new Nezumikun::EffectFill(canvas);
+        this->current_effect_ = (!this->is_init) ? ((Nezumikun::Effect *)new Nezumikun::EffectInit(canvas)) : ((Nezumikun::Effect *)new Nezumikun::EffectFill(canvas));
     }
 
-    static uint8_t skip = 4;
-    if (--skip == 0) {
-        skip = 4;
-    } else {
+    if (this->current_effect_->wait()) {
         return;
     }
 
     this->current_effect_->loop();
+    if (!this->is_init && this->current_effect_->isFinished()) {
+        this->is_init = true;
+        delete this->current_effect_;
+        this->current_effect_ = nullptr;
+    }
 
     this->show_(addressable_light);
     addressable_light->schedule_show();

@@ -29,6 +29,7 @@ namespace esphome {
         ~EffectFill();
         virtual void reset() override;
         virtual void loop() override;    
+        virtual bool wait() override;
     };
 
   }

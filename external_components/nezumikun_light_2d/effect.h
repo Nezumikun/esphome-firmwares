@@ -1,7 +1,6 @@
 #pragma once
 
 #include "canvas.h"
-
 namespace esphome {
   namespace Nezumikun {
 
@@ -16,6 +15,7 @@ namespace esphome {
         bool isFinished();
         virtual void reset();
         virtual void loop() = 0;
+        virtual bool wait();
     };
 
   }

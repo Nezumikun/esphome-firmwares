@@ -1,3 +1,6 @@
+substitutions:
+  initial_brightness: 100%
+
 #captive_portal:
 
 # Enable logging
