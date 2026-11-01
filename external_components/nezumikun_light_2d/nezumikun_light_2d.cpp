@@ -41,7 +41,13 @@ void NezumikunLight2DComponent::loop() {
     if (canvas == nullptr) return;
 
     if (!this->current_effect_) {
-        this->current_effect_ = (!this->is_init) ? ((Nezumikun::Effect *)new Nezumikun::EffectInit(canvas)) : ((Nezumikun::Effect *)new Nezumikun::EffectFill(canvas));
+        // this->current_effect_ = (!this->is_init) ? ((Nezumikun::Effect *)new Nezumikun::EffectInit(canvas)) : ((Nezumikun::Effect *)new Nezumikun::EffectFill(canvas));
+        if (this->is_init) {
+            uint8_t rnd = Nezumikun::random8(2);
+            this->current_effect_ = (rnd == 0) ? (Nezumikun::Effect *)new Nezumikun::EffectFill(canvas) : ((Nezumikun::Effect *)new Nezumikun::EffectRainbow(canvas));
+        } else {
+            this->current_effect_ = (Nezumikun::Effect *)new Nezumikun::EffectInit(canvas);
+        }
     }
 
     if (this->current_effect_->wait()) {
@@ -49,10 +55,16 @@ void NezumikunLight2DComponent::loop() {
     }
 
     this->current_effect_->loop();
-    if (!this->is_init && this->current_effect_->isFinished()) {
-        this->is_init = true;
-        delete this->current_effect_;
-        this->current_effect_ = nullptr;
+    if (this->current_effect_->isFinished()) {
+        if (!this->is_init) {
+            this->is_init = true;
+            delete this->current_effect_;
+            this->current_effect_ = nullptr;
+        } else {
+            ESP_LOGI(TAG, "Effect finished");
+            delete this->current_effect_;
+            this->current_effect_ = nullptr;
+        }
     }
 
     this->show_(addressable_light);
