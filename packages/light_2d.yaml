@@ -34,5 +34,22 @@ light:
               it.all() = Color::BLACK;
               return;
             }
-            id(light_2d).set_effect_active(true);
-
+            id(light_2d).set_mode_demo();
+      - addressable_lambda:
+          name: "Fill"
+          update_interval: 500ms
+          lambda: |-
+            if (initial_run) {
+              it.all() = Color::BLACK;
+              return;
+            }
+            id(light_2d).set_mode_fill();
+      - addressable_lambda:
+          name: "Rainbow"
+          update_interval: 500ms
+          lambda: |-
+            if (initial_run) {
+              it.all() = Color::BLACK;
+              return;
+            }
+            id(light_2d).set_mode_rainbow();
