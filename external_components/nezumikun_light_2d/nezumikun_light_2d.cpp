@@ -49,7 +49,14 @@ void NezumikunLight2DComponent::loop() {
         } else {
             if (this->is_init) {
                 uint8_t rnd = Nezumikun::random8(2);
-                this->current_effect_ = (rnd == 0) ? (Nezumikun::Effect *) this->effect_fill_ : (Nezumikun::Effect *) this->effect_rainbow_;
+                if (rnd == 0) {
+                    this->current_effect_ = this->effect_fill_;
+                    this->repeat_effect_ = 5 + Nezumikun::random8(10);
+                } else {
+                    this->current_effect_ = this->effect_rainbow_;
+                    this->repeat_effect_ = 1 + Nezumikun::random8(3);
+                }
+                
             } else {
                 this->current_effect_ = (Nezumikun::Effect *) this->effect_init_;
             }
@@ -67,7 +74,11 @@ void NezumikunLight2DComponent::loop() {
             this->is_init = true;
             this->current_effect_ = nullptr;
         } else {
-            this->current_effect_ = nullptr;
+            if (--this->repeat_effect_ == 0) {
+                this->current_effect_ = nullptr;
+            } else {
+                // ESP_LOGI(TAG, "Repeat count = %i", this->repeat_effect_);
+            }
         }
     }
 

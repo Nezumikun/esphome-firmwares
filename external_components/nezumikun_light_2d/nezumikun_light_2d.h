@@ -49,6 +49,7 @@ class NezumikunLight2DComponent : public Component {
     uint8_t hue_ = 0;
     uint8_t canvas_width_ = 0;
     uint8_t canvas_height_ = 0;
+    uint8_t repeat_effect_ = 0;
     Nezumikun::Effect * current_effect_{nullptr};
     Nezumikun::Canvas * canvas_{nullptr};
 };
