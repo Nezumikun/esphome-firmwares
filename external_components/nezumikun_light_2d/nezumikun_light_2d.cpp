@@ -33,6 +33,7 @@ void NezumikunLight2DComponent::loop() {
     if (current_effect != "Demo"
          && current_effect != "Fill"
          && current_effect != "Rainbow"
+         && current_effect != "Perlin Noise"
     ) {
         this->is_effect_active = false;
         return;
@@ -46,14 +47,20 @@ void NezumikunLight2DComponent::loop() {
             this->current_effect_ = this->effect_fill_;
         } else if (this->mode_ == Mode::RAINBOW) {
             this->current_effect_ = this->effect_rainbow_;
+        } else if (this->mode_ == Mode::NOISE) {
+            this->current_effect_ = this->effect_noise_;
         } else {
             if (this->is_init) {
                 uint8_t rnd = Nezumikun::random8(2);
+                 ESP_LOGI(TAG, "rnd = %i", rnd);
                 if (rnd == 0) {
                     this->current_effect_ = this->effect_fill_;
                     this->repeat_effect_ = 5 + Nezumikun::random8(10);
-                } else {
+                } else if (rnd == 1) {
                     this->current_effect_ = this->effect_rainbow_;
+                    this->repeat_effect_ = 1 + Nezumikun::random8(3);
+                } else {
+                    this->current_effect_ = this->effect_noise_;
                     this->repeat_effect_ = 1 + Nezumikun::random8(3);
                 }
                 
@@ -113,6 +120,7 @@ Nezumikun::Canvas* NezumikunLight2DComponent::get_canvas_() {
         this->effect_init_ = new Nezumikun::EffectInit(this->canvas_);
         this->effect_fill_ = new Nezumikun::EffectFill(this->canvas_);
         this->effect_rainbow_ = new Nezumikun::EffectRainbow(this->canvas_);
+        this->effect_noise_ = new Nezumikun::EffectPerlinNoise(this->canvas_);
     }
     return this->canvas_;
 }
