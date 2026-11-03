@@ -19,7 +19,6 @@ void NezumikunLight2DComponent::setup() {
     ESP_LOGI(TAG, "NezumikunLight2DComponent setup() called");
 }
 
-
 // Main loop: handles UDP reception and LED update
 void NezumikunLight2DComponent::loop() {
     // Get the AddressableLight object
@@ -31,8 +30,10 @@ void NezumikunLight2DComponent::loop() {
 
     // Check if the current effect is one of the allowed UDP effect names
     std::string current_effect = this->light_strip_->get_effect_name();
-    if (current_effect != "Demo" &&
-        current_effect != "UDP Effect") {
+    if (current_effect != "Demo"
+         && current_effect != "Fill"
+         && current_effect != "Rainbow"
+    ) {
         this->is_effect_active = false;
         return;
     }
@@ -41,7 +42,25 @@ void NezumikunLight2DComponent::loop() {
     if (canvas == nullptr) return;
 
     if (!this->current_effect_) {
-        this->current_effect_ = (!this->is_init) ? ((Nezumikun::Effect *)new Nezumikun::EffectInit(canvas)) : ((Nezumikun::Effect *)new Nezumikun::EffectFill(canvas));
+        if (this->mode_ == Mode::FILL) {
+            this->current_effect_ = this->effect_fill_;
+        } else if (this->mode_ == Mode::RAINBOW) {
+            this->current_effect_ = this->effect_rainbow_;
+        } else {
+            if (this->is_init) {
+                uint8_t rnd = Nezumikun::random8(2);
+                if (rnd == 0) {
+                    this->current_effect_ = this->effect_fill_;
+                    this->repeat_effect_ = 5 + Nezumikun::random8(10);
+                } else {
+                    this->current_effect_ = this->effect_rainbow_;
+                    this->repeat_effect_ = 1 + Nezumikun::random8(3);
+                }
+                
+            } else {
+                this->current_effect_ = (Nezumikun::Effect *) this->effect_init_;
+            }
+        }
     }
 
     if (this->current_effect_->wait()) {
@@ -49,10 +68,18 @@ void NezumikunLight2DComponent::loop() {
     }
 
     this->current_effect_->loop();
-    if (!this->is_init && this->current_effect_->isFinished()) {
-        this->is_init = true;
-        delete this->current_effect_;
-        this->current_effect_ = nullptr;
+
+    if (this->current_effect_->isFinished() && (this->mode_ == Mode::DEMO)) {
+        if (!this->is_init) {
+            this->is_init = true;
+            this->current_effect_ = nullptr;
+        } else {
+            if (--this->repeat_effect_ == 0) {
+                this->current_effect_ = nullptr;
+            } else {
+                // ESP_LOGI(TAG, "Repeat count = %i", this->repeat_effect_);
+            }
+        }
     }
 
     this->show_(addressable_light);
@@ -83,6 +110,9 @@ Nezumikun::Canvas* NezumikunLight2DComponent::get_canvas_() {
         if ((this->canvas_width_ == 0) || (this->canvas_height_ == 0))
             return nullptr;
         this->canvas_ = new Nezumikun::Canvas(this->canvas_width_, this->canvas_height_);
+        this->effect_init_ = new Nezumikun::EffectInit(this->canvas_);
+        this->effect_fill_ = new Nezumikun::EffectFill(this->canvas_);
+        this->effect_rainbow_ = new Nezumikun::EffectRainbow(this->canvas_);
     }
     return this->canvas_;
 }
@@ -108,12 +138,16 @@ void NezumikunLight2DComponent::show_(light::AddressableLight* addressable_light
             pixel.set(Color(r, g, b));
         }
     }
-    // for (uint8_t i = 0; i < this->skipCount; i++) {
-    // for (uint16_t p = this->skip[i].start; p < this->skip[i].start + this->skip[i].length; p++) {
-    //     this->leds[p] = CRGB::Black;
-    // }
-    // }
-    // FastLED.show(this->canvas->getBrightness());
+}
+
+void NezumikunLight2DComponent::set_mode_(Mode mode) {
+    if (this->mode_ != mode) {
+        if (this->canvas_) {
+            this->canvas_->fill({ .red = 0, .green = 0, .blue = 0 });
+        }
+        this->current_effect_ = nullptr;
+        this->mode_ = mode;
+    }
 }
 
 }  // namespace nezumikun_light_2d
