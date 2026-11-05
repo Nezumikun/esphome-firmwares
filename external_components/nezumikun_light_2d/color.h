@@ -63,7 +63,7 @@ namespace esphome {
     { 0xFF, 0xFF, 0xFF }, { 0xFF, 0xA5, 0x00 }, { 0xFF, 0x00, 0x00 }, { 0x8B, 0x00, 0x00 }
     };
 
-    RGB color_from_palette (const PaletteRGB16 pal16, uint8_t index, uint16_t size, uint8_t brightness = 255);
+    RGB color_from_palette (const PaletteRGB16 pal16, uint8_t index, uint8_t brightness = 255);
 
   }
 }

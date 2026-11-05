@@ -20,12 +20,10 @@ namespace esphome {
     void EffectPerlinNoise::reset() {
       this->is_finished_ = false;
       this->start_time_ = esphome::millis();
+      this->submode_ = random8(5);
     }
 
-    void EffectPerlinNoise::loop() {
-      if (this->is_finished_) {
-        this->reset();
-      }
+    void EffectPerlinNoise::loop_perlin() {
       uint8_t width = this->canvas_->getWidth();
       for (uint8_t i = 0; i < this->canvas_->getHeight(false); i++) {
         uint16_t ioffset = this->scale * i;
@@ -46,6 +44,38 @@ namespace esphome {
       }
       this->x++;
       this->y--;
+    }
+
+    void EffectPerlinNoise::loop_paletted() {
+      uint8_t width = this->canvas_->getWidth();
+      uint8_t height = this->canvas_->getHeight();
+      for (uint8_t y = 0; y < height; y++) {
+        for (uint8_t x = 0; x < width; x++) {
+          Nezumikun::RGB color = color_from_palette(
+            this->submode_ == 1 ? Nezumikun::palettePartyColors :
+            this->submode_ == 2 ? Nezumikun::paletteHeatColors :
+            this->submode_ == 3 ? Nezumikun::paletteRainbowColors :
+            this->submode_ == 4 ? Nezumikun::paletteLavaColors :
+            Nezumikun::paletteCloudColors, inoise8(this->y + y * scale, this->x + x * scale, this->z)
+          );
+          this->canvas_->setPixel(x, y, color);
+        }
+      }
+      this->z += this->speed;
+      // this->x++;
+      // this->y--;
+    }
+
+    void EffectPerlinNoise::loop() {
+      if (this->is_finished_) {
+        this->reset();
+      }
+
+      if (this->submode_ == 0) {
+        this->loop_perlin();
+      } else {
+        this->loop_paletted();
+      }
 
       uint32_t now = esphome::millis();
       uint32_t elapsed = now - start_time_;

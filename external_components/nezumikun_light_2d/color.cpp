@@ -67,7 +67,7 @@ namespace esphome {
       return out;
     }
 
-    RGB color_from_palette (const PaletteRGB16 pal16, uint8_t index, uint16_t size, uint8_t brightness) {
+    RGB color_from_palette (const PaletteRGB16 pal16, uint8_t index, uint8_t brightness) {
       uint8_t hi4 = index >> 4;
       uint8_t lo4 = index & 0x0F;
       const RGB* entry = pal16 + hi4;
