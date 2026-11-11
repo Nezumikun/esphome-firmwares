@@ -6,6 +6,7 @@ namespace esphome {
   namespace Nezumikun {
     uint8_t random8();
     uint8_t random8(uint8_t limit);
+    uint16_t random16();
     uint16_t random16(uint16_t limit);
     uint16_t beat88(uint16_t beats_per_minute_88, uint32_t timebase = 0);
     uint8_t beat8(uint16_t beats_per_minute, uint32_t timebase = 0);
@@ -17,5 +18,6 @@ namespace esphome {
     uint8_t beatsin8(uint16_t beats_per_minute, uint8_t lowest = 0, uint8_t highest = 255, uint32_t timebase = 0, uint8_t phase_offset = 0);
     uint16_t beatsin16( uint16_t beats_per_minute, uint16_t lowest = 0, uint16_t highest = 65535, uint32_t timebase = 0, uint16_t phase_offset = 0);
     uint8_t inoise8(uint16_t x, uint16_t y);
+    uint8_t inoise8(uint16_t x, uint16_t y, uint16_t z);
   }
 }
