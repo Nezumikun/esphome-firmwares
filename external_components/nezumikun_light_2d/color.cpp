@@ -1,5 +1,6 @@
 #include "color.h"
 #include "math.h"
+#include "esphome/core/log.h"
 
 #define fade8(x, b)     (((uint16_t)(x) * ((b) + 1)) >> 8)
 
@@ -109,6 +110,73 @@ namespace esphome {
       }
       RGB out = { red, green, blue };
       return out;
+    }
+
+    RGB color_from_palette (const GradientPalette* gp, uint8_t index, uint8_t brightness) {
+      GradientPalette * a = nullptr;
+      GradientPalette * b = nullptr;
+      for(uint8_t i = 0; 1 == 1; i++) {
+        a = (GradientPalette *) &gp[i];
+        if (i > 0) {
+          b = (GradientPalette *) &gp[i - 1];
+        }
+        if (a->index >= index) break;
+        if (a->index == 255) break;
+      }
+      if (b && (a->index != index)) {
+        const float t = ((float)index - a->index) / (b->index - a->index);
+        const uint8_t red = a->red + (b->red - a->red) * t;
+        const uint8_t green = a->green + (b->green - a->green) * t;
+        const uint8_t blue = a->blue + (b->blue - a->blue) * t;
+        // ESP_LOGI("TAG", "index = %i: B: index = %i, RGB = {%i, %i, %i} -> A: index = %i, RGB = {%i, %i, %i} t = %f RGB = {%i, %i, %i}", index, b->index, b->red, b->green, b->blue, a->index, a->red, a->green, a->blue, t, red, green, blue);
+        return { red, green, blue };
+      } else {
+        // ESP_LOGI("TAG", "index = %i: { index = %i, RGB = {%i, %i, %i} }", index, a->index, a->red, a->green, a->blue);
+        return { a->red, a->green, a->blue };
+      }
+      /*
+      uint8_t hi4 = index >> 4;
+      uint8_t lo4 = index & 0x0F;
+      const RGB* entry = pal16 + hi4;
+      uint8_t red = entry->red;
+      uint8_t green = entry->green;
+      uint8_t blue = entry->blue;
+      if (lo4) {
+        if (hi4 == 15) {
+          entry = pal16;
+        } else {
+          ++entry;
+        }
+        uint8_t f2 = lo4 << 4;
+        uint8_t f1 = 255 - f2;
+        red = esp_scale8(red, f1) + esp_scale8(entry->red, f2);
+        green = esp_scale8(green, f1) + esp_scale8(entry->green, f2);
+        blue = esp_scale8(blue, f1) + esp_scale8(entry->blue, f2);
+      }
+      if (brightness != 255) {
+        if (brightness) {
+          ++brightness;
+          if (red) {
+            red = esp_scale8(red, brightness);
+            ++red;
+          }
+          if (green) {
+            green = esp_scale8(green, brightness);
+            ++green;
+          }
+          if (blue) {
+            blue = esp_scale8(blue, brightness);
+            ++blue;
+          }
+        } else {
+          red = 0;
+          green = 0;
+          blue = 0;
+        }
+      }
+      RGB out = { red, green, blue };
+      return out;
+      */
     }
 
     void fill_solid(RGB * leds, uint16_t size, const RGB color) {

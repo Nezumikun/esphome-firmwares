@@ -65,5 +65,51 @@ namespace esphome {
 
     RGB color_from_palette (const PaletteRGB16 pal16, uint8_t index, uint8_t brightness = 255);
 
+    typedef struct {
+      uint8_t index;
+      uint8_t red;
+      uint8_t green;
+      uint8_t blue;
+    } GradientPalette;
+
+    const GradientPalette gradientPaletteXMass[] = {
+      { 0,   0, 12,  0 }, 
+      { 40,   0, 55,  0 }, 
+      { 66,   1, 117,  2 }, 
+      { 77,   1, 84,  1 }, 
+      { 81,   0, 55,  0 }, 
+      { 119,   0, 12,  0 }, 
+      { 153,  42,  0,  0 }, 
+      { 181, 121,  0,  0 }, 
+      { 204, 255, 12,  8 }, 
+      { 224, 121,  0,  0 }, 
+      { 244,  42,  0,  0 }, 
+      { 255,  42,  0,  0 }
+    };
+
+    const GradientPalette gradientPaletteAurora[] = {
+      { 0,  17, 177,  13 },
+      { 64, 121, 242,   5 },
+      { 128,  25, 173, 121 },
+      { 192, 250,  77, 127 },
+      { 255, 171, 101, 221 }
+    };
+
+    const GradientPalette gradientPaletteRedwhite[] = {
+      { 0, 255, 0, 0 },
+      { 25, 255, 255, 255 },
+      { 51, 255, 0, 0 },
+      { 76, 255, 255, 255 },
+      { 102, 255, 0, 0 },
+      { 127, 255, 255, 255 },
+      { 153, 255, 0, 0 },
+      { 178, 255, 255, 255 },
+      { 204, 255, 0, 0 },
+      { 229, 255, 255, 255 },
+      { 255, 255, 0, 0 }
+    };
+
+    RGB color_from_palette (const GradientPalette* gp, uint8_t index, uint8_t brightness = 255);
+
   }
 }
