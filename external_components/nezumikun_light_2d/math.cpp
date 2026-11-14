@@ -310,5 +310,10 @@ namespace esphome {
         uint8_t ans = qadd8( n, n);        //   0..255
         return ans;
     }    
+
+    uint8_t qsub8(uint8_t a, uint8_t b) {
+      if (b >= a) return 0;
+      return a - b;
+    }
   }
 }

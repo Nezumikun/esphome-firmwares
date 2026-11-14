@@ -109,6 +109,13 @@ namespace esphome {
       { 255, 255, 0, 0 }
     };
 
+    const GradientPalette gradientPaletteFire[] = {
+      { 0, 0, 0, 0 }, 
+      { 32, 255, 0, 0 },
+      { 190, 255, 255, 0 },
+      { 255, 255, 255, 255 }
+    };
+
     RGB color_from_palette (const GradientPalette* gp, uint8_t index, uint8_t brightness = 255);
 
   }

@@ -27,13 +27,15 @@ class NezumikunLight2DComponent : public Component {
     void set_mode_fill() { this->set_mode_(Mode::FILL); }
     void set_mode_rainbow() { this->set_mode_(Mode::RAINBOW); }
     void set_mode_noise() { this->set_mode_(Mode::NOISE); }
+    void set_mode_fire() { this->set_mode_(Mode::FIRE); }
 
   protected:
     enum Mode {
       DEMO,
       FILL,
       RAINBOW,
-      NOISE
+      NOISE,
+      FIRE
     } mode_ = Mode::DEMO;
     bool is_init = false;
     // Internal members
@@ -42,6 +44,7 @@ class NezumikunLight2DComponent : public Component {
     Nezumikun::EffectFill* effect_fill_{nullptr};
     Nezumikun::EffectRainbow* effect_rainbow_{nullptr};
     Nezumikun::EffectPerlinNoise* effect_noise_{nullptr};
+    Nezumikun::EffectFire* effect_fire_{nullptr};
 
     // Returns the AddressableLight pointer or nullptr if not available
     light::AddressableLight* get_addressable_light_();

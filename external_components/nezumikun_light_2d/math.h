@@ -19,5 +19,6 @@ namespace esphome {
     uint16_t beatsin16( uint16_t beats_per_minute, uint16_t lowest = 0, uint16_t highest = 65535, uint32_t timebase = 0, uint16_t phase_offset = 0);
     uint8_t inoise8(uint16_t x, uint16_t y);
     uint8_t inoise8(uint16_t x, uint16_t y, uint16_t z);
+    uint8_t qsub8(uint8_t a, uint8_t b);
   }
 }

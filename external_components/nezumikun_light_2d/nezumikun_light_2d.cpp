@@ -49,9 +49,11 @@ void NezumikunLight2DComponent::loop() {
             this->current_effect_ = this->effect_rainbow_;
         } else if (this->mode_ == Mode::NOISE) {
             this->current_effect_ = this->effect_noise_;
+        } else if (this->mode_ == Mode::FIRE) {
+            this->current_effect_ = this->effect_fire_;
         } else {
             if (this->is_init) {
-                uint8_t rnd = Nezumikun::random8(2);
+                uint8_t rnd = Nezumikun::random8(3);
                  ESP_LOGI(TAG, "rnd = %i", rnd);
                 if (rnd == 0) {
                     this->current_effect_ = this->effect_fill_;
@@ -59,8 +61,11 @@ void NezumikunLight2DComponent::loop() {
                 } else if (rnd == 1) {
                     this->current_effect_ = this->effect_rainbow_;
                     this->repeat_effect_ = 1 + Nezumikun::random8(3);
-                } else {
+                } else if (rnd == 2) {
                     this->current_effect_ = this->effect_noise_;
+                    this->repeat_effect_ = 1 + Nezumikun::random8(3);
+                } else {
+                    this->current_effect_ = this->effect_fire_;
                     this->repeat_effect_ = 1 + Nezumikun::random8(3);
                 }
                 
@@ -121,6 +126,7 @@ Nezumikun::Canvas* NezumikunLight2DComponent::get_canvas_() {
         this->effect_fill_ = new Nezumikun::EffectFill(this->canvas_);
         this->effect_rainbow_ = new Nezumikun::EffectRainbow(this->canvas_);
         this->effect_noise_ = new Nezumikun::EffectPerlinNoise(this->canvas_);
+        this->effect_fire_ = new Nezumikun::EffectFire(this->canvas_);
     }
     return this->canvas_;
 }
